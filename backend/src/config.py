@@ -20,6 +20,20 @@ class Settings(BaseSettings):
     API_KEYS: str = "key1,key2,key3"
     SESSION_TIMEOUT_HOURS: int = 24
     
+    # LLM Configuration (for Phase 2+)
+    LLM_PROVIDER: str = "lmstudio"  # Options: openai, anthropic, gemini, lmstudio, ollama
+    LM_STUDIO_API_BASE: str = "http://localhost:1234/v1"
+    LM_STUDIO_MODEL: str = "local-model"
+    OPENAI_API_KEY: str = ""  # Required for OpenAI provider
+    OPENAI_MODEL: str = "gpt-4"
+    
+    # Embedding Configuration (for Phase 4+)
+    # Embeddings can use a different provider/model than LLM calls
+    EMBEDDING_PROVIDER: str = ""  # If empty, uses LLM_PROVIDER. Options: openai, lmstudio, etc.
+    EMBEDDING_MODEL: str = ""  # Embedding model name. For LMStudio, set to your embedding model name
+    # Default embedding models by provider (used if EMBEDDING_MODEL not set)
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-ada-002"  # OpenAI default
+    
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     
