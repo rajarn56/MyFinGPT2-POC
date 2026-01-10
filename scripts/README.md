@@ -47,6 +47,25 @@ Check status of all services (local and Docker).
 - Backend status (and health)
 - Docker containers status
 
+### `start-chroma-local.sh`
+Start ChromaDB server locally using the virtual environment.
+
+**Usage:**
+```bash
+./scripts/start-chroma-local.sh
+```
+
+**What it does:**
+- Checks if virtual environment exists
+- Checks if chromadb is installed
+- Reads `CHROMA_DATA_PATH` from `.env` (default: `./data/chroma`)
+- Creates data directory if needed
+- Starts ChromaDB server on configured port (default: 8001)
+
+**Data Storage:**
+- Data is stored in `data/chroma/` under project root by default
+- Configure custom path via `CHROMA_DATA_PATH` in `.env`
+
 ## Local Development Setup
 
 For local development, you can run components on your laptop:

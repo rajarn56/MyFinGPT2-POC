@@ -62,10 +62,17 @@ fi
 # Check if Chroma is accessible (if using local Chroma)
 CHROMA_HOST=$(grep "^CHROMA_HOST=" ../.env | cut -d '=' -f2 | tr -d '"' || echo "localhost")
 CHROMA_PORT=$(grep "^CHROMA_PORT=" ../.env | cut -d '=' -f2 | tr -d '"' || echo "8001")
+CHROMA_DATA_PATH=$(grep "^CHROMA_DATA_PATH=" ../.env | cut -d '=' -f2 | tr -d '"' || echo "./data/chroma")
 if ! curl -s "http://$CHROMA_HOST:$CHROMA_PORT/api/v1/heartbeat" >/dev/null 2>&1; then
     echo "Warning: Cannot connect to Chroma at $CHROMA_HOST:$CHROMA_PORT"
-    echo "Start Chroma with: docker-compose up -d chroma"
-    echo "Or install Chroma locally and update CHROMA_HOST/CHROMA_PORT in .env"
+    echo "Options:"
+    echo "  1. Start Chroma with Docker: docker-compose up -d chroma"
+    echo "  2. Start local ChromaDB server (recommended):"
+    echo "     cd .. && ./scripts/start-chroma-local.sh"
+    echo "  3. Manual start:"
+    echo "     cd .. && source backend/.venv/bin/activate"
+    echo "     chroma run --path $CHROMA_DATA_PATH --port $CHROMA_PORT"
+    echo "     (Data will be stored in: $CHROMA_DATA_PATH)"
 else
     echo "✓ Chroma connection OK"
 fi

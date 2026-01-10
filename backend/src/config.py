@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # Database
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8001
+    CHROMA_DATA_PATH: str = "./data/chroma"  # Local ChromaDB data storage path
     NEO4J_URI: str = "bolt://localhost:7687"
     NEO4J_USER: str = "neo4j"
     NEO4J_PASSWORD: str = "password"

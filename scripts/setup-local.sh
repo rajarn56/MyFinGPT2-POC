@@ -53,6 +53,20 @@ source .venv/bin/activate
 echo "Installing dependencies..."
 uv pip install -r requirements.txt
 
+# Optionally install ChromaDB for local ChromaDB server
+echo ""
+read -p "Install ChromaDB for local server? (y/n) [n]: " install_chroma
+if [[ "$install_chroma" =~ ^[Yy]$ ]]; then
+    echo "Installing ChromaDB..."
+    uv pip install chromadb
+    echo -e "${GREEN}✓${NC} ChromaDB installed"
+    echo "  To start local ChromaDB server:"
+    echo "    cd .. && ./scripts/start-chroma-local.sh"
+    echo "    (Data will be stored in: ./data/chroma/)"
+else
+    echo "Skipping ChromaDB installation (using Docker or remote ChromaDB)"
+fi
+
 # Create .env file if it doesn't exist
 cd ..
 if [ ! -f ".env" ]; then
@@ -64,9 +78,17 @@ if [ ! -f ".env" ]; then
     echo "   - Set LM_STUDIO_MODEL to your LLM model name"
     echo "   - Set EMBEDDING_MODEL to your embedding model name (REQUIRED for vector search)"
     echo "   - Set EMBEDDING_PROVIDER=lmstudio if using LMStudio for embeddings"
+    echo "   - Set CHROMA_DATA_PATH if using local ChromaDB (default: ./data/chroma)"
 else
     echo -e "${GREEN}✓${NC} .env file already exists"
 fi
+
+# Create data directory structure
+cd ..
+echo ""
+echo "Creating data directory structure..."
+mkdir -p data/chroma
+echo -e "${GREEN}✓${NC} Data directories created (data/chroma/)"
 
 echo ""
 echo -e "${GREEN}Setup complete!${NC}"
@@ -74,6 +96,8 @@ echo ""
 echo "Next steps:"
 echo "1. Edit .env file with your local configuration"
 echo "2. Start Neo4j locally (if not using Docker): neo4j start"
-echo "3. Start LMStudio and load a model"
-echo "4. Run: ./scripts/start-backend-local.sh"
+echo "3. Start LMStudio and load both LLM and embedding models"
+echo "4. Start ChromaDB (if using local): ./scripts/start-chroma-local.sh"
+echo "   Or use Docker: docker-compose up -d chroma"
+echo "5. Run: ./scripts/start-backend-local.sh"
 

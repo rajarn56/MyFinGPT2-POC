@@ -137,9 +137,24 @@ This script will:
    # - LM_STUDIO_MODEL=your-llm-model-name
    # - EMBEDDING_PROVIDER=lmstudio  # Optional: use different provider for embeddings
    # - EMBEDDING_MODEL=your-embedding-model-name  # Required for LMStudio embeddings
+   # - CHROMA_DATA_PATH=./data/chroma  # Local ChromaDB data path (default)
    ```
 
-4. **Start backend:**
+4. **Start ChromaDB (if using local ChromaDB instead of Docker):**
+   ```bash
+   # Option A: Use convenience script (recommended)
+   # Folder: Project root (MyFinGPT2-POC/)
+   ./scripts/start-chroma-local.sh
+   
+   # Option B: Manual start
+   # Folder: Project root (MyFinGPT2-POC/)
+   cd backend
+   source .venv/bin/activate
+   cd ..
+   chroma run --path ./data/chroma --port 8001
+   ```
+
+5. **Start backend:**
    ```bash
    ./scripts/start-backend-local.sh
    # Or manually:
@@ -163,7 +178,7 @@ nc -z localhost 7687
 # LMStudio
 curl http://localhost:1234/v1/models
 
-# Chroma (if running locally)
+# Chroma (if running locally or Docker)
 curl http://localhost:8001/api/v1/heartbeat
 
 # Backend
@@ -176,46 +191,82 @@ curl http://localhost:8000/health/
 ```bash
 # Start (Neo4j Desktop)
 # Use Neo4j Desktop GUI to start database
+# (No folder context needed - GUI application)
 
 # Start (Neo4j Community Edition)
+# Folder: Any (system command)
 neo4j start
 
 # Stop
+# Folder: Any (system command)
 neo4j stop
 
 # Status
+# Folder: Any (system command)
 neo4j status
 ```
 
 **LMStudio:**
 ```bash
 # Start: Use LMStudio GUI application
-# Load a model in LMStudio
+# Load TWO models in LMStudio:
+#   1. LLM Model: For agent responses (set in LM_STUDIO_MODEL)
+#   2. Embedding Model: For vector search (set in EMBEDDING_MODEL)
+# Start the local server (usually port 1234)
 # API will be available at http://localhost:1234/v1
+# (No folder context needed - GUI application)
 
 # Verify:
+# Folder: Any
 curl http://localhost:1234/v1/models
 ```
 
 **Chroma (Local - Optional):**
 ```bash
 # Option 1: Use Docker (recommended)
+# Folder: Project root (MyFinGPT2-POC/)
 docker-compose up -d chroma
 
-# Option 2: Install locally (see Chroma docs)
+# Option 2: Install and run locally in virtual environment
+# Step 1: Install ChromaDB (if not already installed)
+# Folder: Project root (MyFinGPT2-POC/)
+cd backend
+source .venv/bin/activate
 pip install chromadb
-chroma run --path ./chroma_data --port 8001
+cd ..
+
+# Step 2: Start ChromaDB server
+# Option A: Use convenience script (recommended)
+# Folder: Project root (MyFinGPT2-POC/)
+./scripts/start-chroma-local.sh
+
+# Option B: Manual start
+# Folder: Project root (MyFinGPT2-POC/)
+source backend/.venv/bin/activate
+chroma run --path ./data/chroma --port 8001
 ```
+
+**Chroma Data Folder:**
+- **Default location**: `data/chroma/` under project root (MyFinGPT2-POC/data/chroma/)
+- This folder is **shared and persistent** across ChromaDB restarts
+- The folder will be **created automatically** if it doesn't exist
+- To use a different location, set `CHROMA_DATA_PATH` in `.env`:
+  ```
+  CHROMA_DATA_PATH=./data/chroma
+  ```
+- The data folder contains all ChromaDB collections and is **safe to backup/share**
 
 **Backend (Local):**
 ```bash
 # Start
+# Folder: Project root (MyFinGPT2-POC/)
 ./scripts/start-backend-local.sh
 
 # Stop
-# Press Ctrl+C
+# Folder: Terminal running backend (Press Ctrl+C)
 
 # Restart
+# Folder: Project root (MyFinGPT2-POC/)
 # Stop then start again
 ```
 
@@ -224,6 +275,7 @@ chroma run --path ./chroma_data --port 8001
 You can mix Docker and local components:
 
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Example: Use Docker for Chroma, local for Neo4j and LMStudio
 docker-compose up -d chroma  # Chroma in Docker
 # Neo4j and LMStudio running locally
@@ -236,6 +288,7 @@ docker-compose up -d chroma  # Chroma in Docker
 
 **Start:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 docker-compose up -d chroma neo4j
 # Or start individually:
 docker-compose up -d chroma
@@ -244,6 +297,7 @@ docker-compose up -d neo4j
 
 **Stop:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 docker-compose stop chroma neo4j
 # Or stop individually:
 docker-compose stop chroma
@@ -252,6 +306,7 @@ docker-compose stop neo4j
 
 **Restart:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 docker-compose restart chroma neo4j
 # Or restart individually:
 docker-compose restart chroma
@@ -260,6 +315,7 @@ docker-compose restart neo4j
 
 **Verify:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Check status
 docker-compose ps
 
@@ -268,6 +324,7 @@ docker-compose logs chroma
 docker-compose logs neo4j
 
 # Test connections
+# Folder: Any
 curl http://localhost:8001/api/v1/heartbeat  # Chroma
 curl http://localhost:7474  # Neo4j browser (HTTP)
 ```
@@ -276,6 +333,7 @@ curl http://localhost:7474  # Neo4j browser (HTTP)
 
 **Start:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 cd backend
 source .venv/bin/activate  # Activate virtual environment
 python -m src.main
@@ -285,16 +343,18 @@ uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 
 **Stop:**
 ```bash
-# Press Ctrl+C in the terminal running the backend
+# Folder: Terminal running backend (Press Ctrl+C)
 ```
 
 **Restart:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Stop (Ctrl+C) then start again with the start command above
 ```
 
 **Verify:**
 ```bash
+# Folder: Any
 # Health check
 curl http://localhost:8000/health/
 
@@ -306,15 +366,18 @@ curl http://localhost:8000/health/
 
 **Start all:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Start databases first
 docker-compose up -d chroma neo4j
 
 # Then start backend (in separate terminal)
+# Folder: Project root (MyFinGPT2-POC/)
 cd backend && source .venv/bin/activate && python -m src.main
 ```
 
 **Stop all:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Stop backend (Ctrl+C)
 # Stop databases
 docker-compose stop chroma neo4j
@@ -322,6 +385,7 @@ docker-compose stop chroma neo4j
 
 **Restart all:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Restart databases
 docker-compose restart chroma neo4j
 
@@ -330,9 +394,11 @@ docker-compose restart chroma neo4j
 
 **Verify all:**
 ```bash
+# Folder: Project root (MyFinGPT2-POC/)
 # Check database containers
 docker-compose ps
 
+# Folder: Any
 # Check backend health
 curl http://localhost:8000/health/
 

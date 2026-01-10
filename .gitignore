@@ -36,7 +36,9 @@ GITHUB_SETUP.md
 #*.log
 
 # Data
-data/
+# Note: data/ folder structure is tracked, but actual data files are ignored
+data/*/
+!data/.gitkeep
 *.db
 *.sqlite
 
