@@ -49,6 +49,17 @@ def latest_datetime_reducer(left: datetime, right: datetime) -> datetime:
     return max(left, right)
 
 
+def optional_string_reducer(left: Optional[str], right: Optional[str]) -> Optional[str]:
+    """
+    Reducer for optional string fields: prefer non-None value, otherwise take first.
+    Used for fields like report and query_type that can be set by multiple nodes.
+    """
+    # Prefer non-None value
+    if right is not None:
+        return right
+    return left
+
+
 class AgentState(TypedDict):
     """
     Shared state structure for LangGraph orchestration (Phase 2-3).
@@ -66,8 +77,8 @@ class AgentState(TypedDict):
     # Analyst Agent Output (Phase 3) - can be read by multiple agents in parallel
     analyst_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {analysis, sentiment, trends, etc.}
     
-    # Reporting Agent Output (Phase 3)
-    report: Optional[str]  # Final report in Markdown format
+    # Reporting Agent Output (Phase 3) - can be set by reporting agent after parallel nodes merge
+    report: Annotated[Optional[str], optional_string_reducer]  # Final report in Markdown format
     
     # EDGAR Agent Output (Phase 5)
     edgar_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {company, filings, sections}
@@ -78,8 +89,8 @@ class AgentState(TypedDict):
     # Trend Agent Output (Phase 6) - updated by trend agent
     trend_analysis: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {price_trend, trend_strength, pattern_type, trend_prediction, etc.}
     
-    # Query intent classification (Phase 6)
-    query_type: Optional[str]  # Type of query: "single_entity", "comparison", "trend", "comprehensive", etc.
+    # Query intent classification (Phase 6) - can be set by route_advanced node
+    query_type: Annotated[Optional[str], optional_string_reducer]  # Type of query: "single_entity", "comparison", "trend", "comprehensive", etc.
     
     # Errors - can be updated by multiple agents in parallel
     errors: Annotated[List[str], list_extend_reducer]  # List of error messages
