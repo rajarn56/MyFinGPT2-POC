@@ -12,6 +12,43 @@ def first_value_reducer(left: Any, right: Any) -> Any:
     return left
 
 
+def dict_merge_reducer(left: Dict[str, Any], right: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Reducer for dictionary fields: merge dictionaries, with right values taking precedence.
+    Used for mutable dictionary fields that can be updated by multiple nodes.
+    """
+    result = left.copy() if left else {}
+    if right:
+        result.update(right)
+    return result
+
+
+def list_extend_reducer(left: List[Any], right: List[Any]) -> List[Any]:
+    """
+    Reducer for list fields: extend left list with right list, removing duplicates.
+    Used for mutable list fields that can be updated by multiple nodes.
+    """
+    result = (left.copy() if left else [])
+    if right:
+        # Add items from right that aren't already in left
+        for item in right:
+            if item not in result:
+                result.append(item)
+    return result
+
+
+def latest_datetime_reducer(left: datetime, right: datetime) -> datetime:
+    """
+    Reducer for datetime fields: return the latest (most recent) datetime.
+    Used for updated_at field that can be updated by multiple nodes.
+    """
+    if not left:
+        return right
+    if not right:
+        return left
+    return max(left, right)
+
+
 class AgentState(TypedDict):
     """
     Shared state structure for LangGraph orchestration (Phase 2-3).
@@ -23,36 +60,36 @@ class AgentState(TypedDict):
     query: Annotated[str, first_value_reducer]  # Original user query
     symbols: Annotated[List[str], first_value_reducer]  # Stock symbols extracted from query
     
-    # Research Agent Output (Phase 2)
-    research_data: Dict[str, Any]  # Symbol -> {price, company_info, etc.}
+    # Research Agent Output (Phase 2) - can be read by multiple agents in parallel
+    research_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {price, company_info, etc.}
     
-    # Analyst Agent Output (Phase 3)
-    analyst_data: Dict[str, Any]  # Symbol -> {analysis, sentiment, trends, etc.}
+    # Analyst Agent Output (Phase 3) - can be read by multiple agents in parallel
+    analyst_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {analysis, sentiment, trends, etc.}
     
     # Reporting Agent Output (Phase 3)
     report: Optional[str]  # Final report in Markdown format
     
     # EDGAR Agent Output (Phase 5)
-    edgar_data: Dict[str, Any]  # Symbol -> {company, filings, sections}
+    edgar_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {company, filings, sections}
     
-    # Comparison Agent Output (Phase 6)
-    comparison_data: Dict[str, Any]  # Comparison results: {comparison_type, metrics, comparison_table, insights}
+    # Comparison Agent Output (Phase 6) - updated by comparison agent
+    comparison_data: Annotated[Dict[str, Any], dict_merge_reducer]  # Comparison results: {comparison_type, metrics, comparison_table, insights}
     
-    # Trend Agent Output (Phase 6)
-    trend_analysis: Dict[str, Any]  # Symbol -> {price_trend, trend_strength, pattern_type, trend_prediction, etc.}
+    # Trend Agent Output (Phase 6) - updated by trend agent
+    trend_analysis: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {price_trend, trend_strength, pattern_type, trend_prediction, etc.}
     
     # Query intent classification (Phase 6)
     query_type: Optional[str]  # Type of query: "single_entity", "comparison", "trend", "comprehensive", etc.
     
-    # Errors
-    errors: List[str]  # List of error messages
+    # Errors - can be updated by multiple agents in parallel
+    errors: Annotated[List[str], list_extend_reducer]  # List of error messages
     
-    # Token usage tracking
-    token_usage: Dict[str, Any]  # {agent_name: {prompt_tokens, completion_tokens, total_tokens}}
+    # Token usage tracking - can be updated by multiple agents in parallel
+    token_usage: Annotated[Dict[str, Any], dict_merge_reducer]  # {agent_name: {prompt_tokens, completion_tokens, total_tokens}}
     
-    # Citations
-    citations: List[Dict[str, str]]  # [{source, symbol, type}]
+    # Citations - can be updated by multiple agents in parallel
+    citations: Annotated[List[Dict[str, str]], list_extend_reducer]  # [{source, symbol, type}]
     
     # Timestamps
     created_at: Annotated[datetime, first_value_reducer]  # Immutable: creation time
-    updated_at: datetime  # Mutable: updated by each agent
+    updated_at: Annotated[datetime, latest_datetime_reducer]  # Mutable: updated by each agent (take latest)
