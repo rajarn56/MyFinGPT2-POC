@@ -10,6 +10,7 @@ from loguru import logger
 from src.services.session_service import SessionService
 from src.services.auth_service import AuthService
 from src.services.ingestion_service import IngestionService
+from src.services.progress_manager import progress_manager
 from src.orchestrator.workflow import MyFinGPTWorkflow
 from src.mcp.mcp_client import MCPClient
 from src.agents.research_agent import ResearchAgent
@@ -172,9 +173,12 @@ async def execute_agents(
     
     logger.info(f"Executing agent workflow for transaction {transaction_id}")
     
+    # Phase 7: Create progress tracker for WebSocket updates
+    progress_tracker = progress_manager.create_tracker(x_session_id, transaction_id)
+    
     try:
-        # Execute workflow
-        result = workflow.execute(state)
+        # Execute workflow with progress tracking
+        result = workflow.execute(state, progress_tracker=progress_tracker)
         
         # Determine status
         status = "completed"
@@ -201,3 +205,6 @@ async def execute_agents(
     except Exception as e:
         logger.error(f"Error executing workflow: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Workflow execution failed: {str(e)}")
+    finally:
+        # Phase 7: Clean up progress tracker
+        progress_manager.cleanup_tracker(transaction_id)

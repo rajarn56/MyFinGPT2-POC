@@ -1,4 +1,4 @@
-"""LangGraph workflow for Phase 2, Phase 3, Phase 5, and Phase 6"""
+"""LangGraph workflow for Phase 2, Phase 3, Phase 5, Phase 6, and Phase 7"""
 
 from langgraph.graph import StateGraph, END
 from typing import Dict, Any, List, Optional
@@ -13,6 +13,7 @@ from src.agents.trend_agent import TrendAgent
 from src.models.state import AgentState
 from src.utils.context_merger import ContextMerger
 from src.utils.query_intent import QueryIntentClassifier
+from src.services.progress_manager import ProgressTracker
 
 
 class MyFinGPTWorkflow:
@@ -51,6 +52,7 @@ class MyFinGPTWorkflow:
         self.enable_parallel = enable_parallel
         self.enable_conditional = enable_conditional
         self.intent_classifier = QueryIntentClassifier() if enable_conditional else None
+        self.progress_tracker: Optional[ProgressTracker] = None  # Phase 7: Progress tracking
         self.graph = self._build_graph()
         logger.info(
             f"MyFinGPTWorkflow initialized "
@@ -173,7 +175,18 @@ class MyFinGPTWorkflow:
         Returns:
             Updated AgentState dictionary
         """
-        return self.research_agent.execute(state)
+        agent_name = "ResearchAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Gathering market data", "Fetching company information"])
+            result = self.research_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _research_parallel_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -185,34 +198,50 @@ class MyFinGPTWorkflow:
         Returns:
             Updated AgentState dictionary with merged results
         """
+        agent_name = "ResearchAgent"
         symbols = state.get("symbols", [])
         
-        if len(symbols) <= 1:
-            # Single symbol, no need for parallel execution
-            return self.research_agent.execute(state)
-        
-        # Execute research for each symbol in parallel
-        # Note: LangGraph doesn't natively support parallel execution within a node,
-        # so we simulate it by creating separate states and merging results
-        logger.info(f"Executing parallel research for {len(symbols)} symbols")
-        
-        # For now, execute sequentially but prepare for true parallel execution
-        # In a production system, you might use asyncio or threading here
-        results = []
-        for symbol in symbols:
-            symbol_state = state.copy()
-            symbol_state["symbols"] = [symbol]
-            result = self.research_agent.execute(symbol_state)
-            results.append(result)
-        
-        # Merge results
-        merged_state = state.copy()
-        merged_state["research_data"] = ContextMerger.merge_research_data(results)
-        merged_state["citations"] = ContextMerger.merge_citations(results)
-        merged_state["errors"] = ContextMerger.merge_errors(results)
-        merged_state["token_usage"] = ContextMerger.merge_token_usage(results)
-        
-        return merged_state
+        try:
+            if self.progress_tracker:
+                tasks = [f"Gathering data for {symbol}" for symbol in symbols]
+                self.progress_tracker.start_agent(agent_name, tasks)
+            
+            if len(symbols) <= 1:
+                # Single symbol, no need for parallel execution
+                result = self.research_agent.execute(state)
+                if self.progress_tracker:
+                    self.progress_tracker.complete_agent(agent_name)
+                return result
+            
+            # Execute research for each symbol in parallel
+            # Note: LangGraph doesn't natively support parallel execution within a node,
+            # so we simulate it by creating separate states and merging results
+            logger.info(f"Executing parallel research for {len(symbols)} symbols")
+            
+            # For now, execute sequentially but prepare for true parallel execution
+            # In a production system, you might use asyncio or threading here
+            results = []
+            for symbol in symbols:
+                symbol_state = state.copy()
+                symbol_state["symbols"] = [symbol]
+                result = self.research_agent.execute(symbol_state)
+                results.append(result)
+            
+            # Merge results
+            merged_state = state.copy()
+            merged_state["research_data"] = ContextMerger.merge_research_data(results)
+            merged_state["citations"] = ContextMerger.merge_citations(results)
+            merged_state["errors"] = ContextMerger.merge_errors(results)
+            merged_state["token_usage"] = ContextMerger.merge_token_usage(results)
+            
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            
+            return merged_state
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _analyst_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -227,7 +256,19 @@ class MyFinGPTWorkflow:
         if not self.analyst_agent:
             logger.warning("Analyst agent not configured, skipping")
             return state
-        return self.analyst_agent.execute(state)
+        
+        agent_name = "AnalystAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Analyzing data", "Generating insights"])
+            result = self.analyst_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _edgar_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -242,7 +283,19 @@ class MyFinGPTWorkflow:
         if not self.edgar_agent:
             logger.warning("EDGAR agent not configured, skipping")
             return state
-        return self.edgar_agent.execute(state)
+        
+        agent_name = "EdgarAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Fetching SEC filings", "Processing documents"])
+            result = self.edgar_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _reporting_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -257,7 +310,19 @@ class MyFinGPTWorkflow:
         if not self.reporting_agent:
             logger.warning("Reporting agent not configured, skipping")
             return state
-        return self.reporting_agent.execute(state)
+        
+        agent_name = "ReportingAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Generating report", "Formatting output"])
+            result = self.reporting_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _comparison_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -272,7 +337,19 @@ class MyFinGPTWorkflow:
         if not self.comparison_agent:
             logger.warning("Comparison agent not configured, skipping")
             return state
-        return self.comparison_agent.execute(state)
+        
+        agent_name = "ComparisonAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Comparing entities", "Analyzing differences"])
+            result = self.comparison_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _trend_node(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -287,7 +364,19 @@ class MyFinGPTWorkflow:
         if not self.trend_agent:
             logger.warning("Trend agent not configured, skipping")
             return state
-        return self.trend_agent.execute(state)
+        
+        agent_name = "TrendAgent"
+        try:
+            if self.progress_tracker:
+                self.progress_tracker.start_agent(agent_name, ["Analyzing trends", "Identifying patterns"])
+            result = self.trend_agent.execute(state)
+            if self.progress_tracker:
+                self.progress_tracker.complete_agent(agent_name)
+            return result
+        except Exception as e:
+            if self.progress_tracker:
+                self.progress_tracker.fail_agent(agent_name, str(e))
+            raise
     
     def _route_advanced_agents(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -320,17 +409,30 @@ class MyFinGPTWorkflow:
         logger.info(f"Query classified as: {state['query_type']}")
         return state
     
-    def execute(self, state: Dict[str, Any]) -> Dict[str, Any]:
+    def execute(
+        self,
+        state: Dict[str, Any],
+        progress_tracker: Optional[ProgressTracker] = None
+    ) -> Dict[str, Any]:
         """
         Execute the workflow
         
         Args:
             state: Initial AgentState dictionary
+            progress_tracker: Optional progress tracker for Phase 7
             
         Returns:
             Final AgentState dictionary
         """
+        # Set progress tracker for this execution
+        self.progress_tracker = progress_tracker
+        
         logger.info(f"Executing workflow for transaction {state.get('transaction_id')}")
-        result = self.graph.invoke(state)
-        logger.info(f"Workflow completed for transaction {state.get('transaction_id')}")
-        return result
+        
+        try:
+            result = self.graph.invoke(state)
+            logger.info(f"Workflow completed for transaction {state.get('transaction_id')}")
+            return result
+        finally:
+            # Clean up progress tracker
+            self.progress_tracker = None

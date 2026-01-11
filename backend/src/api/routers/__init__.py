@@ -1,5 +1,5 @@
 """API routers"""
 
-from . import health, auth, agents
+from . import health, auth, agents, websocket
 
-__all__ = ["health", "auth", "agents"]
+__all__ = ["health", "auth", "agents", "websocket"]
