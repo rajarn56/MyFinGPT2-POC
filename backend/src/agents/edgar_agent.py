@@ -159,11 +159,17 @@ class EdgarAgent(BaseAgent):
             
             # Get filings
             if form_types:
-                filings = company.get_filings(form=form_types)
+                filings_obj = company.get_filings(form=form_types)
+                # Convert EntityFilings to list
+                filings = list(filings_obj) if hasattr(filings_obj, '__iter__') else []
             else:
                 # Default: get recent 10-K and 10-Q filings
-                filings = company.get_filings(form="10-K")
-                filings.extend(company.get_filings(form="10-Q"))
+                filings_10k = company.get_filings(form="10-K")
+                filings_10q = company.get_filings(form="10-Q")
+                # Convert EntityFilings objects to lists and combine
+                filings_list_10k = list(filings_10k) if hasattr(filings_10k, '__iter__') else []
+                filings_list_10q = list(filings_10q) if hasattr(filings_10q, '__iter__') else []
+                filings = filings_list_10k + filings_list_10q
             
             # Limit and process filings
             filings_list = []

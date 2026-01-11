@@ -1,7 +1,15 @@
 """LangGraph state model for Phase 2 and Phase 3"""
 
-from typing import TypedDict, List, Dict, Any, Optional
+from typing import TypedDict, List, Dict, Any, Optional, Annotated
 from datetime import datetime
+
+
+def first_value_reducer(left: Any, right: Any) -> Any:
+    """
+    Reducer for immutable fields: always return the first (left) value.
+    Used for fields that should never change during workflow execution.
+    """
+    return left
 
 
 class AgentState(TypedDict):
@@ -9,11 +17,11 @@ class AgentState(TypedDict):
     Shared state structure for LangGraph orchestration (Phase 2-3).
     This is the central context repository for all agents.
     """
-    # Query information
-    transaction_id: str  # Unique transaction identifier for this query
-    session_id: str  # Session identifier
-    query: str  # Original user query
-    symbols: List[str]  # Stock symbols extracted from query
+    # Query information (immutable fields - use Annotated with reducer)
+    transaction_id: Annotated[str, first_value_reducer]  # Unique transaction identifier for this query
+    session_id: Annotated[str, first_value_reducer]  # Session identifier
+    query: Annotated[str, first_value_reducer]  # Original user query
+    symbols: Annotated[List[str], first_value_reducer]  # Stock symbols extracted from query
     
     # Research Agent Output (Phase 2)
     research_data: Dict[str, Any]  # Symbol -> {price, company_info, etc.}
@@ -46,5 +54,5 @@ class AgentState(TypedDict):
     citations: List[Dict[str, str]]  # [{source, symbol, type}]
     
     # Timestamps
-    created_at: datetime
-    updated_at: datetime
+    created_at: Annotated[datetime, first_value_reducer]  # Immutable: creation time
+    updated_at: datetime  # Mutable: updated by each agent
