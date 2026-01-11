@@ -1,54 +1,48 @@
-2026-01-10 22:36:50 | INFO     | __main__:startup_event:48 - Starting MyFinGPT-POC-V2 backend
-2026-01-10 22:36:50 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
-2026-01-10 22:36:50 | INFO     | src.graph_db.schema:initialize_schema:23 - Initializing Neo4j schema for Phase 4...
-2026-01-10 22:36:50 | INFO     | src.graph_db.schema:initialize_schema:32 - Neo4j schema initialized successfully
-2026-01-10 22:36:50 | INFO     | __main__:startup_event:59 - Neo4j schema initialized
-2026-01-10 22:36:50 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:initialize_schema:35 - Initializing EDGAR Neo4j schema...
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: textChunkEmbeddings (General text content)
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: riskChunkEmbeddings (Risk factor discussions)
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: financialChunkEmbeddings (Financial analysis)
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: strategyChunkEmbeddings (Strategic/forward-looking content)
-2026-01-10 22:36:50 | INFO     | src.graph_db.edgar_schema:initialize_schema:47 - EDGAR Neo4j schema initialized successfully
-2026-01-10 22:36:50 | INFO     | __main__:startup_event:67 - EDGAR Neo4j schema initialized (embedding dimension: 768)
-2026-01-10 22:37:50 | INFO     | src.mcp.mcp_client:__init__:27 - Initialized MCPClient (server_url=None)
-2026-01-10 22:37:50 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
-2026-01-10 22:37:50 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-10 22:37:50 | INFO     | src.agents.base_agent:__init__:19 - Initialized ResearchAgent
-2026-01-10 22:37:50 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-10 22:37:50 | INFO     | src.agents.base_agent:__init__:19 - Initialized AnalystAgent
-2026-01-10 22:37:50 | INFO     | src.agents.base_agent:__init__:19 - Initialized ReportingAgent
-2026-01-10 22:37:50 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
-2026-01-10 22:37:50 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-10 22:37:50 | INFO     | src.agents.base_agent:__init__:19 - Initialized EdgarAgent
-2026-01-10 22:37:51 | INFO     | src.agents.edgar_agent:_initialize_edgartools:61 - Set EDGAR identity: rajarn56@outlook.com
-2026-01-10 22:37:51 | INFO     | src.agents.edgar_agent:_initialize_edgartools:67 - Successfully initialized edgartools
-2026-01-10 22:37:51 | INFO     | src.api.routers.agents:get_workflow:85 - EDGAR Agent initialized successfully
-2026-01-10 22:37:51 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
-2026-01-10 22:37:51 | INFO     | src.agents.base_agent:__init__:19 - Initialized ComparisonAgent
-2026-01-10 22:37:51 | INFO     | src.agents.base_agent:__init__:19 - Initialized TrendAgent
-2026-01-10 22:37:51 | INFO     | src.api.routers.agents:get_workflow:100 - Comparison and Trend agents initialized successfully
-2026-01-10 22:37:51 | INFO     | src.utils.query_intent:__init__:46 - Initialized QueryIntentClassifier
-2026-01-10 22:37:51 | INFO     | src.orchestrator.workflow:_build_graph:109 - LangGraph workflow compiled successfully
-2026-01-10 22:37:51 | INFO     | src.orchestrator.workflow:__init__:55 - MyFinGPTWorkflow initialized (Phase 5: edgar=True, Phase 6: comparison=True, trend=True, parallel=True, conditional=True)
-2026-01-10 22:37:51 | INFO     | src.api.routers.agents:execute_agents:173 - Executing agent workflow for transaction txn_05ad609424aa4caa
-2026-01-10 22:37:51 | INFO     | src.orchestrator.workflow:execute:333 - Executing workflow for transaction txn_05ad609424aa4caa
-2026-01-10 22:37:51 | INFO     | src.agents.base_agent:log_execution:58 - ResearchAgent executing for transaction txn_05ad609424aa4caa
-2026-01-10 22:37:51 | INFO     | src.services.ingestion_service:ingest_news_article:82 - Ingested news article: Company Information: Apple Inc.... (ID: dc73c1a7-f61e-4081-bf16-28c106db5cdd)
-2026-01-10 22:37:51 | INFO     | src.agents.research_agent:execute:97 - Successfully fetched data for AAPL
-2026-01-10 22:37:51 | INFO     | src.agents.base_agent:log_execution:58 - EdgarAgent executing for transaction txn_05ad609424aa4caa
-2026-01-10 22:37:51 | INFO     | src.agents.edgar_agent:execute:104 - Fetching EDGAR data for AAPL
-2026-01-10 22:37:52 | ERROR    | src.agents.edgar_agent:_fetch_company_filings:186 - Error fetching filings for AAPL: 'EntityFilings' object has no attribute 'extend'
-2026-01-10 22:37:52 | ERROR    | src.agents.edgar_agent:execute:124 - Error fetching EDGAR data for AAPL: 'EntityFilings' object has no attribute 'extend'
-2026-01-10 22:37:52 | INFO     | src.agents.base_agent:log_execution:58 - AnalystAgent executing for transaction txn_05ad609424aa4caa
-2026-01-10 22:38:01 | INFO     | src.agents.analyst_agent:execute:66 - Completed analysis for AAPL
-2026-01-10 22:38:01 | INFO     | src.utils.query_intent:classify:92 - Classified query: type=single_entity, flags={'is_comparison': False, 'is_trend': False, 'is_edgar': False, 'is_comprehensive': False, 'is_single_entity': True, 'is_multi_entity': False}
-2026-01-10 22:38:01 | INFO     | src.orchestrator.workflow:_route_advanced_agents:320 - Query classified as: single_entity
-2026-01-10 22:38:01 | INFO     | src.agents.base_agent:log_execution:58 - ComparisonAgent executing for transaction txn_05ad609424aa4caa
-2026-01-10 22:38:01 | INFO     | src.agents.comparison_agent:execute:69 - Single symbol detected, performing benchmark comparison
-2026-01-10 22:38:01 | INFO     | src.agents.base_agent:log_execution:58 - TrendAgent executing for transaction txn_05ad609424aa4caa
-2026-01-10 22:38:01 | WARNING  | src.agents.trend_agent:_analyze_trend:111 - Insufficient historical data for AAPL, using basic trend analysis
-2026-01-10 22:38:18 | INFO     | src.agents.trend_agent:execute:75 - Completed trend analysis for AAPL
-2026-01-10 22:38:18 | ERROR    | src.api.routers.agents:execute_agents:202 - Error executing workflow: At key 'transaction_id': Can receive only one value per step. Use an Annotated key to handle multiple values.
+2026-01-10 22:52:54 | INFO     | __main__:startup_event:48 - Starting MyFinGPT-POC-V2 backend
+2026-01-10 22:52:54 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-10 22:52:54 | INFO     | src.graph_db.schema:initialize_schema:23 - Initializing Neo4j schema for Phase 4...
+2026-01-10 22:52:54 | INFO     | src.graph_db.schema:initialize_schema:32 - Neo4j schema initialized successfully
+2026-01-10 22:52:54 | INFO     | __main__:startup_event:59 - Neo4j schema initialized
+2026-01-10 22:52:54 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:initialize_schema:35 - Initializing EDGAR Neo4j schema...
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: textChunkEmbeddings (General text content)
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: riskChunkEmbeddings (Risk factor discussions)
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: financialChunkEmbeddings (Financial analysis)
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: strategyChunkEmbeddings (Strategic/forward-looking content)
+2026-01-10 22:52:54 | INFO     | src.graph_db.edgar_schema:initialize_schema:47 - EDGAR Neo4j schema initialized successfully
+2026-01-10 22:52:54 | INFO     | __main__:startup_event:67 - EDGAR Neo4j schema initialized (embedding dimension: 768)
+2026-01-10 22:53:08 | INFO     | src.mcp.mcp_client:__init__:27 - Initialized MCPClient (server_url=None)
+2026-01-10 22:53:08 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-10 22:53:08 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized ResearchAgent
+2026-01-10 22:53:08 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized AnalystAgent
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized ReportingAgent
+2026-01-10 22:53:08 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-10 22:53:08 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized EdgarAgent
+2026-01-10 22:53:08 | INFO     | src.agents.edgar_agent:_initialize_edgartools:61 - Set EDGAR identity: rajarn56@outlook.com
+2026-01-10 22:53:08 | INFO     | src.agents.edgar_agent:_initialize_edgartools:67 - Successfully initialized edgartools
+2026-01-10 22:53:08 | INFO     | src.api.routers.agents:get_workflow:85 - EDGAR Agent initialized successfully
+2026-01-10 22:53:08 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized ComparisonAgent
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:__init__:19 - Initialized TrendAgent
+2026-01-10 22:53:08 | INFO     | src.api.routers.agents:get_workflow:100 - Comparison and Trend agents initialized successfully
+2026-01-10 22:53:08 | INFO     | src.utils.query_intent:__init__:46 - Initialized QueryIntentClassifier
+2026-01-10 22:53:08 | INFO     | src.orchestrator.workflow:_build_graph:109 - LangGraph workflow compiled successfully
+2026-01-10 22:53:08 | INFO     | src.orchestrator.workflow:__init__:55 - MyFinGPTWorkflow initialized (Phase 5: edgar=True, Phase 6: comparison=True, trend=True, parallel=True, conditional=True)
+2026-01-10 22:53:08 | INFO     | src.api.routers.agents:execute_agents:173 - Executing agent workflow for transaction txn_bdd45c1ac0644034
+2026-01-10 22:53:08 | INFO     | src.orchestrator.workflow:execute:333 - Executing workflow for transaction txn_bdd45c1ac0644034
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:log_execution:58 - ResearchAgent executing for transaction 
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:log_execution:58 - EdgarAgent executing for transaction 
+2026-01-10 22:53:08 | INFO     | src.agents.edgar_agent:execute:97 - Query doesn't require EDGAR data, skipping
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:log_execution:58 - AnalystAgent executing for transaction 
+2026-01-10 22:53:08 | WARNING  | src.agents.analyst_agent:execute:53 - No research data available for analysis
+2026-01-10 22:53:08 | INFO     | src.utils.query_intent:classify:92 - Classified query: type=single_entity, flags={'is_comparison': False, 'is_trend': False, 'is_edgar': False, 'is_comprehensive': False, 'is_single_entity': False, 'is_multi_entity': False}
+2026-01-10 22:53:08 | INFO     | src.orchestrator.workflow:_route_advanced_agents:320 - Query classified as: single_entity
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:log_execution:58 - ComparisonAgent executing for transaction 
+2026-01-10 22:53:08 | INFO     | src.agents.base_agent:log_execution:58 - TrendAgent executing for transaction 
+2026-01-10 22:53:08 | WARNING  | src.agents.comparison_agent:execute:64 - No research data available for comparison
+2026-01-10 22:53:08 | WARNING  | src.agents.trend_agent:execute:62 - No research data available for trend analysis
+2026-01-10 22:53:08 | ERROR    | src.api.routers.agents:execute_agents:202 - Error executing workflow: At key 'research_data': Can receive only one value per step. Use an Annotated key to handle multiple values.
 For troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/errors/INVALID_CONCURRENT_GRAPH_UPDATE
-2026-01-10 22:39:45 | INFO     | __main__:shutdown_event:77 - Shutting down MyFinGPT-POC-V2 backend
