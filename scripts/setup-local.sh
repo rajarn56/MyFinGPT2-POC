@@ -68,7 +68,10 @@ else
 fi
 
 # Create .env file if it doesn't exist
-cd ..
+# Navigate to project root (we're currently in backend/)
+cd "$(dirname "$0")/.." || exit 1
+PROJECT_ROOT="$(pwd)"
+
 if [ ! -f ".env" ]; then
     echo "Creating .env file from .env.example..."
     cp .env.example .env
@@ -83,12 +86,14 @@ else
     echo -e "${GREEN}✓${NC} .env file already exists"
 fi
 
-# Create data directory structure
-cd ..
+# Create data directory structure (under project root)
 echo ""
 echo "Creating data directory structure..."
 mkdir -p data/chroma
-echo -e "${GREEN}✓${NC} Data directories created (data/chroma/)"
+mkdir -p data/sessions
+echo -e "${GREEN}✓${NC} Data directories created:"
+echo "   - data/chroma/ (for ChromaDB)"
+echo "   - data/sessions/ (for session storage)"
 
 echo ""
 echo -e "${GREEN}Setup complete!${NC}"

@@ -7,11 +7,20 @@ from loguru import logger
 
 from src.models.session import Session
 from src.config import settings
+from src.utils.paths import get_data_path
 
 
 class SessionService:
-    def __init__(self, storage_path: Path = Path("data/sessions")):
-        self.storage_path = storage_path
+    def __init__(self, storage_path: Optional[Path] = None):
+        """
+        Initialize SessionService
+        
+        Args:
+            storage_path: Optional custom storage path. If None, uses project root/data/sessions
+        """
+        if storage_path is None:
+            storage_path = get_data_path("sessions")
+        self.storage_path = Path(storage_path)
         self.storage_path.mkdir(parents=True, exist_ok=True)
         self.timeout_hours = settings.SESSION_TIMEOUT_HOURS
     
