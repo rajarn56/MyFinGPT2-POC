@@ -28,6 +28,13 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""  # Required for OpenAI provider
     OPENAI_MODEL: str = "gpt-4"
     
+    # MCP Server Configuration (for Phase 3+)
+    ALPHA_VANTAGE_API_KEY: str = ""  # Alpha Vantage API key
+    FMP_API_KEY: str = ""  # Financial Modeling Prep API key
+    
+    # EDGAR Configuration (for Phase 5+)
+    EDGAR_IDENTITY: str = ""  # Email address for SEC EDGAR identity (required by SEC)
+    
     # Embedding Configuration (for Phase 4+)
     # Embeddings can use a different provider/model than LLM calls
     EMBEDDING_PROVIDER: str = ""  # If empty, uses LLM_PROVIDER. Options: openai, lmstudio, etc.

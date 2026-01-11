@@ -1,0 +1,57 @@
+# Application Configuration
+app:
+  name: MyFinGPT-POC-V2
+  version: 0.1.0
+  environment: development
+
+# Database Configuration
+databases:
+  chroma:
+    host: localhost
+    port: 8001
+    data_path: ./data/chroma
+  neo4j:
+    uri: bolt://localhost:7687
+    user: neo4j
+    password: password
+
+# LLM Configuration
+llm:
+  provider: lmstudio  # Options: openai, anthropic, gemini, lmstudio, ollama
+  model: local-model
+  temperature: 0.7
+  # Provider-specific settings
+  lmstudio:
+    api_base: http://localhost:1234/v1
+  openai:
+    api_key: your_key_here
+    model: gpt-4
+
+# Embedding Configuration
+embeddings:
+  provider: ""  # If empty, uses LLM provider
+  model: ""  # If empty, uses provider default
+  openai_model: text-embedding-ada-002
+
+# Agent Configuration
+agents:
+  research:
+    timeout: 30
+  analyst:
+    timeout: 60
+  reporting:
+    timeout: 90
+
+# Session Configuration
+session:
+  timeout_hours: 24
+  api_keys:
+    - key1
+    - key2
+    - key3
+
+# CORS Configuration
+cors:
+  origins:
+    - http://localhost:3000
+    - http://localhost:5173

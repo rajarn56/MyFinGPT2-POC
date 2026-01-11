@@ -7,3 +7,12 @@ uvicorn[standard]>=0.24.0
 chromadb>=0.4.15
 neo4j>=5.15.0
 
+# Phase 2: Agent System Dependencies
+langgraph>=0.0.20
+langchain>=0.1.0
+litellm>=1.0.0
+yfinance>=0.2.0
+httpx>=0.25.0
+
+# Phase 5: EDGAR Integration
+edgartools>=5.8.0
