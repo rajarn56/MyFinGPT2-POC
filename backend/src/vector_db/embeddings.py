@@ -101,7 +101,7 @@ class EmbeddingPipeline:
             )
             
             if response and response.data and len(response.data) > 0:
-                embedding = response.data[0].embedding
+                embedding = response.data[0]["embedding"]
                 # Cache dimension on first successful call
                 if self._cached_dimension is None:
                     self._cached_dimension = len(embedding)
@@ -127,7 +127,7 @@ class EmbeddingPipeline:
             )
             
             if response and response.data and len(response.data) > 0:
-                embedding = response.data[0].embedding
+                embedding = response.data[0]["embedding"]
                 # Cache dimension on first successful call
                 if self._cached_dimension is None:
                     self._cached_dimension = len(embedding)
