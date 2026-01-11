@@ -1,0 +1,23 @@
+2026-01-10 21:58:47 | INFO     | __main__:startup_event:48 - Starting MyFinGPT-POC-V2 backend
+2026-01-10 21:58:47 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-10 21:58:47 | INFO     | src.graph_db.schema:initialize_schema:23 - Initializing Neo4j schema for Phase 4...
+2026-01-10 21:58:47 | INFO     | src.graph_db.schema:initialize_schema:32 - Neo4j schema initialized successfully
+2026-01-10 21:58:47 | INFO     | __main__:startup_event:59 - Neo4j schema initialized
+2026-01-10 21:58:47 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-10 21:58:48 | ERROR    | src.vector_db.embeddings:_generate_lmstudio_embedding:112 - LMStudio embedding failed: 'dict' object has no attribute 'embedding'
+2026-01-10 21:58:48 | ERROR    | src.vector_db.embeddings:generate_embedding:78 - Error generating embedding: 'dict' object has no attribute 'embedding'
+2026-01-10 21:58:48 | ERROR    | src.vector_db.embeddings:get_embedding_dimension:183 - Error detecting embedding dimension: 'dict' object has no attribute 'embedding'
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:initialize_schema:35 - Initializing EDGAR Neo4j schema...
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: textChunkEmbeddings (General text content)
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: riskChunkEmbeddings (Risk factor discussions)
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: financialChunkEmbeddings (Financial analysis)
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: strategyChunkEmbeddings (Strategic/forward-looking content)
+2026-01-10 21:58:48 | INFO     | src.graph_db.edgar_schema:initialize_schema:47 - EDGAR Neo4j schema initialized successfully
+2026-01-10 21:58:48 | INFO     | __main__:startup_event:67 - EDGAR Neo4j schema initialized (embedding dimension: 1536)
+2026-01-10 21:59:49 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-10 21:59:49 | INFO     | src.vector_db.chroma_client:_get_or_create_collection:58 - Created collection: financial_news
+2026-01-10 21:59:49 | INFO     | src.vector_db.chroma_client:_get_or_create_collection:58 - Created collection: company_analysis
+2026-01-10 21:59:49 | INFO     | src.vector_db.chroma_client:_get_or_create_collection:58 - Created collection: conversation_history
+2026-01-10 21:59:49 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-10 21:59:49 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-10 21:59:49 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687

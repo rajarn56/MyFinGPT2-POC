@@ -1,0 +1,60 @@
+✓ litellm and requests libraries imported successfully
+
+============================================================
+LMStudio Connectivity Test
+============================================================
+Timestamp: 2026-01-10T22:02:30.695241
+Project root: /Users/rajarn/Learn-Agentic/FinalFinGPT/MyFinGPT2-POC
+
+Configuration:
+  LM_STUDIO_API_BASE: http://localhost:1234/v1
+  LM_STUDIO_MODEL: gpt-oss-20b
+  LLM_PROVIDER: lmstudio
+  EMBEDDING_PROVIDER: lmstudio
+  EMBEDDING_MODEL: text-embedding-nomic-embed-text-v1.5
+
+============================================================
+TEST 1: LMStudio Server Availability
+============================================================
+
+Using LM Studio API base: http://localhost:1234/v1
+✓ Success: LM Studio server is running
+  Available models (2):
+    1. openai/gpt-oss-20b
+    2. text-embedding-nomic-embed-text-v1.5
+
+============================================================
+TEST 2: LLM Model Chat Completion
+============================================================
+
+Testing LLM model: gpt-oss-20b
+API base: http://localhost:1234/v1
+Using LiteLLM model format: openai/gpt-oss-20b
+✓ Success: LLM model is working
+  Response: ...
+
+============================================================
+TEST 3: Embedding Model
+============================================================
+
+Testing embedding model: text-embedding-nomic-embed-text-v1.5
+API base: http://localhost:1234/v1
+Using LiteLLM model format: openai/text-embedding-nomic-embed-text-v1.5
+✓ Success: Embedding model is working
+  Dimension: 768
+  Sample values: [0.008762961253523827, 0.06087906286120415, -0.13047875463962555, -0.02645181305706501, 0.005784173496067524]
+  Non-zero count: 768/768
+
+============================================================
+TEST SUMMARY
+============================================================
+✓ PASSED: Server Availability
+✓ PASSED: LLM Model
+✓ PASSED: Embedding Model
+
+============================================================
+✓ ALL TESTS PASSED
+
+LMStudio is configured correctly and ready to use.
+============================================================
+
