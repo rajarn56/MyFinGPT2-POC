@@ -569,13 +569,19 @@ Save the `session_id` from the response for subsequent requests.
 **3. Test Agent Execution (Phase 2-6):**
 ```bash
 # Replace SESSION_ID with the session ID from step 2
+# Note: The system intelligently extracts symbols from queries, so you can use various formats:
+# - "Analyze AAPL stock performance" (symbols will be extracted automatically)
+# - "Tell me about Apple" (company name will be mapped to AAPL)
+# - "Compare Apple and Microsoft" (both will be extracted and mapped)
+
 curl -X POST http://localhost:8000/api/agents/execute \
   -H "X-Session-ID: SESSION_ID" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "Analyze AAPL stock performance",
-    "symbols": ["AAPL"]
+    "symbols": []
   }'
+# Note: Even with empty symbols array, backend will extract "AAPL" from query
 ```
 
 **4. Test Knowledge Layer Search (Phase 4):**
@@ -622,9 +628,15 @@ npm run dev
 **3. Test Frontend Features:**
 
 **Chat Interface:**
-- Type a query in the chat input (e.g., "Analyze AAPL stock")
-- The system should extract stock symbols automatically
+- Type a query in the chat input (e.g., "Analyze AAPL stock", "Tell me about Apple", "Compare Apple and Microsoft")
+- The system intelligently extracts stock symbols using LLM-based parsing
+- Supports various formats:
+  - Stock symbols: "AAPL", "MSFT"
+  - Company names: "Apple", "Microsoft", "Tesla"
+  - Parenthetical notation: "Apple Inc. (AAPL)", "Microsoft (MSFT)"
+  - Case variations: "aapl", "AAPL", "Apple"
 - Submit the query and wait for analysis results
+- If symbols aren't extracted, backend will handle extraction automatically
 
 **Analysis Panel:**
 - After submitting a query, the analysis report should appear in the right panel

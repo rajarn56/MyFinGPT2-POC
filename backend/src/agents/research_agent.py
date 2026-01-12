@@ -7,6 +7,7 @@ from loguru import logger
 from src.agents.base_agent import BaseAgent
 from src.mcp.mcp_client import MCPClient
 from src.services.ingestion_service import IngestionService
+from src.utils.query_parser import QueryParser
 
 
 class ResearchAgent(BaseAgent):
@@ -43,11 +44,54 @@ class ResearchAgent(BaseAgent):
         self.log_execution(state)
         
         symbols = state.get("symbols", [])
+        query = state.get("query", "")
+        
+        # Validate symbols - if empty, try to extract from query
+        if not symbols or len(symbols) == 0:
+            logger.warning(f"ResearchAgent received empty symbols list for query: {query}")
+            
+            # Try to extract symbols from query using parser
+            try:
+                from src.utils.query_parser import QueryParser
+                from src.utils.llm_client import LLMClient
+                
+                llm_client = LLMClient()
+                parser = QueryParser(llm_client=llm_client)
+                parsed = parser.parse(query)
+                extracted_symbols = parsed.get("symbols", [])
+                
+                if extracted_symbols:
+                    symbols = extracted_symbols
+                    state["symbols"] = symbols
+                    logger.info(f"ResearchAgent extracted symbols from query: {symbols}")
+                else:
+                    error_msg = (
+                        f"No stock symbols found in query: '{query}'. "
+                        f"Please provide a stock symbol (e.g., 'AAPL') or company name (e.g., 'Apple')."
+                    )
+                    logger.error(error_msg)
+                    if "errors" not in state:
+                        state["errors"] = []
+                    state["errors"].append(error_msg)
+                    return state
+            except Exception as e:
+                error_msg = (
+                    f"Failed to extract symbols from query '{query}': {str(e)}. "
+                    f"Please provide a stock symbol (e.g., 'AAPL') or company name (e.g., 'Apple')."
+                )
+                logger.error(error_msg)
+                if "errors" not in state:
+                    state["errors"] = []
+                state["errors"].append(error_msg)
+                return state
+        
         research_data = {}
         
         # Ensure citations list exists
         if "citations" not in state:
             state["citations"] = []
+        
+        logger.info(f"ResearchAgent processing {len(symbols)} symbol(s): {symbols}")
         
         for symbol in symbols:
             try:

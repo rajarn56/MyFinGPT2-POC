@@ -11,6 +11,7 @@ from src.services.session_service import SessionService
 from src.services.auth_service import AuthService
 from src.services.ingestion_service import IngestionService
 from src.services.progress_manager import progress_manager
+from src.services.vector_search_service import VectorSearchService
 from src.orchestrator.workflow import MyFinGPTWorkflow
 from src.mcp.mcp_client import MCPClient
 from src.agents.research_agent import ResearchAgent
@@ -23,6 +24,7 @@ from src.graph_db.neo4j_client import Neo4jClient
 from src.vector_db.chroma_client import ChromaClient
 from src.vector_db.embeddings import EmbeddingPipeline
 from src.utils.llm_client import LLMClient
+from src.utils.query_parser import QueryParser
 from src.config import settings
 
 
@@ -48,6 +50,22 @@ def get_auth_service() -> AuthService:
 def get_ingestion_service() -> IngestionService:
     """Dependency for ingestion service (Phase 4)"""
     return IngestionService()
+
+
+def get_query_parser() -> QueryParser:
+    """Dependency for query parser"""
+    llm_client = LLMClient()
+    return QueryParser(llm_client=llm_client)
+
+
+def get_vector_search_service() -> VectorSearchService:
+    """Dependency for vector search service"""
+    chroma_client = ChromaClient(
+        host=settings.CHROMA_HOST,
+        port=settings.CHROMA_PORT
+    )
+    embedding_pipeline = EmbeddingPipeline()
+    return VectorSearchService(chroma_client, embedding_pipeline)
 
 
 def get_workflow() -> MyFinGPTWorkflow:
@@ -103,6 +121,10 @@ def get_workflow() -> MyFinGPTWorkflow:
         logger.warning(f"Could not initialize Comparison/Trend agents: {e}")
         logger.warning("Comparison and Trend functionality will be disabled")
     
+    # Initialize query parser for workflow
+    llm_client = LLMClient()
+    query_parser = QueryParser(llm_client=llm_client)
+    
     return MyFinGPTWorkflow(
         research_agent=research_agent,
         analyst_agent=analyst_agent,
@@ -111,7 +133,8 @@ def get_workflow() -> MyFinGPTWorkflow:
         comparison_agent=comparison_agent,  # Phase 6
         trend_agent=trend_agent,  # Phase 6
         enable_parallel=True,  # Enable parallel execution for Phase 3
-        enable_conditional=True  # Enable conditional routing for Phase 6
+        enable_conditional=True,  # Enable conditional routing for Phase 6
+        query_parser=query_parser  # Pass query parser to workflow
     )
 
 
@@ -125,7 +148,9 @@ async def execute_agents(
     request: ExecuteRequest,
     x_session_id: str = Header(..., alias="X-Session-ID"),
     session_service: SessionService = Depends(get_session_service),
-    workflow: MyFinGPTWorkflow = Depends(get_workflow)
+    workflow: MyFinGPTWorkflow = Depends(get_workflow),
+    query_parser: QueryParser = Depends(get_query_parser),
+    vector_search: VectorSearchService = Depends(get_vector_search_service)
 ):
     """
     Execute agent workflow
@@ -135,6 +160,8 @@ async def execute_agents(
         x_session_id: Session ID from header
         session_service: Session service dependency
         workflow: Workflow dependency
+        query_parser: Query parser dependency
+        vector_search: Vector search service dependency
         
     Returns:
         Execution result with transaction ID and status
@@ -150,20 +177,80 @@ async def execute_agents(
     # Generate transaction ID
     transaction_id = generate_transaction_id()
     
+    # Step 1: Retrieve conversation context for follow-up queries
+    conversation_context = None
+    try:
+        # Search for recent conversation history for this session
+        recent_conversations = vector_search.search_conversation_history(
+            query=request.query,
+            session_id=x_session_id,
+            n_results=3
+        )
+        if recent_conversations:
+            # Combine recent conversations into context
+            conversation_context = "\n".join([
+                conv.get("document", "") for conv in recent_conversations[:2]
+            ])
+            logger.info(f"Retrieved conversation context for session {x_session_id} ({len(recent_conversations)} conversations)")
+    except Exception as e:
+        logger.warning(f"Failed to retrieve conversation context: {e}")
+        # Continue without context
+    
+    # Step 2: Parse query to extract symbols, intent, and entities
+    logger.info(f"Parsing query: {request.query[:100]}...")
+    parsed_result = query_parser.parse(
+        query=request.query,
+        conversation_context=conversation_context
+    )
+    
+    # Extract parsed information
+    extracted_symbols = parsed_result.get("symbols", [])
+    parsed_intent_type = parsed_result.get("intent_type", "analysis")
+    parsed_intent_flags = parsed_result.get("intent_flags", {})
+    parsed_entities = parsed_result.get("entities", {})
+    extraction_method = parsed_result.get("extraction_method", "unknown")
+    needs_clarification = parsed_result.get("needs_clarification", False)
+    
+    # Use extracted symbols if frontend didn't provide them or if extraction found more
+    final_symbols = extracted_symbols if extracted_symbols else request.symbols
+    
+    # Log extraction results
+    logger.info(
+        f"Query parsing completed: method={extraction_method}, "
+        f"symbols={final_symbols}, intent={parsed_intent_type}, "
+        f"entities={parsed_entities}, needs_clarification={needs_clarification}"
+    )
+    
+    # Handle clarification requests
+    if needs_clarification and not final_symbols:
+        clarification_question = parsed_result.get("clarification_question", "Please provide a stock symbol or company name to analyze.")
+        return {
+            "transaction_id": transaction_id,
+            "status": "needs_clarification",
+            "clarification_question": clarification_question,
+            "result": {
+                "query": request.query,
+                "extracted_symbols": extracted_symbols,
+                "extraction_method": extraction_method
+            }
+        }
+    
     # Create initial state (Phase 3: includes analyst_data and report fields, Phase 5: includes edgar_data, Phase 6: includes comparison_data and trend_analysis)
     now = datetime.utcnow()
     state = {
         "transaction_id": transaction_id,
         "session_id": x_session_id,
         "query": request.query,
-        "symbols": request.symbols,
+        "symbols": final_symbols,  # Use parsed symbols
         "research_data": {},
         "analyst_data": {},  # Phase 3
         "report": None,  # Phase 3
         "edgar_data": {},  # Phase 5
         "comparison_data": {},  # Phase 6
         "trend_analysis": {},  # Phase 6
-        "query_type": None,  # Phase 6
+        "query_type": parsed_intent_type,  # Use parsed intent type
+        "intent_flags": parsed_intent_flags,  # Add parsed intent flags
+        "entities": parsed_entities,  # Add parsed entities (timeframes, metrics, filing types)
         "errors": [],
         "token_usage": {},
         "citations": [],
@@ -171,7 +258,10 @@ async def execute_agents(
         "updated_at": now
     }
     
-    logger.info(f"Executing agent workflow for transaction {transaction_id}")
+    logger.info(
+        f"Executing agent workflow for transaction {transaction_id}: "
+        f"query='{request.query}', symbols={final_symbols}, intent={parsed_intent_type}"
+    )
     
     # Phase 7: Create progress tracker for WebSocket updates
     progress_tracker = progress_manager.create_tracker(x_session_id, transaction_id)

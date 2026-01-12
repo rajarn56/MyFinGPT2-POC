@@ -13,6 +13,8 @@ from src.agents.trend_agent import TrendAgent
 from src.models.state import AgentState
 from src.utils.context_merger import ContextMerger
 from src.utils.query_intent import QueryIntentClassifier
+from src.utils.query_parser import QueryParser
+from src.utils.llm_client import LLMClient
 from src.services.progress_manager import ProgressTracker
 
 
@@ -28,7 +30,8 @@ class MyFinGPTWorkflow:
         comparison_agent: Optional[ComparisonAgent] = None,
         trend_agent: Optional[TrendAgent] = None,
         enable_parallel: bool = True,
-        enable_conditional: bool = True
+        enable_conditional: bool = True,
+        query_parser: Optional[QueryParser] = None
     ):
         """
         Initialize workflow
@@ -42,6 +45,7 @@ class MyFinGPTWorkflow:
             trend_agent: Trend Agent instance (Phase 6)
             enable_parallel: Enable parallel execution for multiple symbols (Phase 3)
             enable_conditional: Enable conditional routing based on query intent (Phase 6)
+            query_parser: Query parser for symbol extraction (optional)
         """
         self.research_agent = research_agent
         self.analyst_agent = analyst_agent
@@ -51,7 +55,19 @@ class MyFinGPTWorkflow:
         self.trend_agent = trend_agent
         self.enable_parallel = enable_parallel
         self.enable_conditional = enable_conditional
-        self.intent_classifier = QueryIntentClassifier() if enable_conditional else None
+        
+        # Initialize query parser and intent classifier
+        if enable_conditional:
+            llm_client = LLMClient()
+            if query_parser is None:
+                query_parser = QueryParser(llm_client=llm_client)
+            self.intent_classifier = QueryIntentClassifier(
+                llm_client=llm_client,
+                query_parser=query_parser
+            )
+        else:
+            self.intent_classifier = None
+        
         self.progress_tracker: Optional[ProgressTracker] = None  # Phase 7: Progress tracking
         self.graph = self._build_graph()
         logger.info(
@@ -383,8 +399,8 @@ class MyFinGPTWorkflow:
         Route to advanced agents based on query intent (Phase 6)
         
         This node classifies the query and sets flags for conditional execution.
-        In LangGraph, conditional routing is typically done with conditional edges,
-        but for simplicity, we'll use this node to update state with routing information.
+        If query was already parsed in API router, use that information.
+        Otherwise, classify using intent classifier.
         
         Args:
             state: AgentState dictionary
@@ -392,21 +408,33 @@ class MyFinGPTWorkflow:
         Returns:
             Updated AgentState dictionary with query_type and routing flags
         """
+        # If query was already parsed in API router, use that information
+        if "query_type" in state and state.get("query_type") and "intent_flags" in state:
+            logger.info(f"Using pre-parsed query type: {state['query_type']}")
+            return state
+        
+        # Otherwise, classify using intent classifier
         if not self.intent_classifier:
             # No classifier, skip routing
+            logger.warning("No intent classifier available, skipping routing")
             return state
         
         query = state.get("query", "")
         symbols = state.get("symbols", [])
         
-        # Classify query intent
-        classification = self.intent_classifier.classify(query, symbols)
+        # Classify query intent (classifier will extract symbols if not provided)
+        classification = self.intent_classifier.classify(query, symbols=symbols)
         
         # Update state with classification
         state["query_type"] = classification.get("query_type", "single_entity")
         state["intent_flags"] = classification.get("intent_flags", {})
         
-        logger.info(f"Query classified as: {state['query_type']}")
+        # Update symbols if classifier extracted them
+        if classification.get("symbols") and not symbols:
+            state["symbols"] = classification.get("symbols", [])
+            logger.info(f"Intent classifier extracted symbols: {state['symbols']}")
+        
+        logger.info(f"Query classified as: {state['query_type']}, flags={state.get('intent_flags', {})}")
         return state
     
     def execute(

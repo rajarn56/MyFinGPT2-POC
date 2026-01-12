@@ -89,8 +89,14 @@ class AgentState(TypedDict):
     # Trend Agent Output (Phase 6) - updated by trend agent
     trend_analysis: Annotated[Dict[str, Any], dict_merge_reducer]  # Symbol -> {price_trend, trend_strength, pattern_type, trend_prediction, etc.}
     
-    # Query intent classification (Phase 6) - can be set by route_advanced node
+    # Query intent classification (Phase 6) - can be set by route_advanced node or query parser
     query_type: Annotated[Optional[str], optional_string_reducer]  # Type of query: "single_entity", "comparison", "trend", "comprehensive", etc.
+    
+    # Intent flags from query parser (Phase 7) - can be set by query parser or route_advanced node
+    intent_flags: Annotated[Dict[str, Any], dict_merge_reducer]  # Intent flags: is_comparison, is_trend, is_edgar, etc.
+    
+    # Entities extracted from query (Phase 7) - can be set by query parser
+    entities: Annotated[Dict[str, Any], dict_merge_reducer]  # Extracted entities: timeframes, metrics, filing_types, etc.
     
     # Errors - can be updated by multiple agents in parallel
     errors: Annotated[List[str], list_extend_reducer]  # List of error messages

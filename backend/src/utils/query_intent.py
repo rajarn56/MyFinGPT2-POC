@@ -5,6 +5,7 @@ from loguru import logger
 import re
 
 from src.utils.llm_client import LLMClient
+from src.utils.query_parser import QueryParser
 
 
 class QueryIntentClassifier:
@@ -35,27 +36,51 @@ class QueryIntentClassifier:
         "in-depth", "thorough", "extensive", "all", "everything"
     ]
     
-    def __init__(self, llm_client: Optional[LLMClient] = None):
+    def __init__(self, llm_client: Optional[LLMClient] = None, query_parser: Optional[QueryParser] = None):
         """
         Initialize query intent classifier
         
         Args:
             llm_client: LLM client for advanced classification (optional)
+            query_parser: Query parser for symbol extraction (optional)
         """
         self.llm_client = llm_client
+        self.query_parser = query_parser
         logger.info("Initialized QueryIntentClassifier")
     
-    def classify(self, query: str, symbols: List[str]) -> Dict[str, Any]:
+    def classify(
+        self,
+        query: str,
+        symbols: Optional[List[str]] = None,
+        conversation_context: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Classify query intent
         
         Args:
             query: User query string
-            symbols: List of symbols extracted from query
+            symbols: List of symbols extracted from query (optional, will be extracted if not provided)
+            conversation_context: Previous conversation context for follow-up queries (optional)
             
         Returns:
             Classification dictionary with intent and flags
         """
+        # Extract symbols if not provided
+        if symbols is None or len(symbols) == 0:
+            if self.query_parser:
+                try:
+                    parsed = self.query_parser.parse(query, conversation_context)
+                    symbols = parsed.get("symbols", [])
+                    # Use parser's intent flags if available
+                    parser_intent_flags = parsed.get("intent_flags", {})
+                    parser_intent_type = parsed.get("intent_type")
+                    logger.info(f"Query parser extracted symbols: {symbols}, intent: {parser_intent_type}")
+                except Exception as e:
+                    logger.warning(f"Query parser failed: {e}, using rule-based extraction")
+                    symbols = []
+            else:
+                symbols = []
+        
         query_lower = query.lower()
         
         # Rule-based classification (can be enhanced with LLM)
@@ -68,8 +93,24 @@ class QueryIntentClassifier:
             "is_multi_entity": len(symbols) > 1
         }
         
-        # Determine primary query type
-        query_type = self._determine_query_type(intent_flags, symbols)
+        # If we used query parser, merge its intent flags
+        if self.query_parser:
+            try:
+                parsed = self.query_parser.parse(query, conversation_context)
+                parser_intent_flags = parsed.get("intent_flags", {})
+                # Merge parser flags (they take precedence)
+                intent_flags.update(parser_intent_flags)
+                parser_intent_type = parsed.get("intent_type")
+                if parser_intent_type:
+                    query_type = parser_intent_type
+                else:
+                    query_type = self._determine_query_type(intent_flags, symbols)
+            except Exception as e:
+                logger.warning(f"Failed to use parser intent flags: {e}")
+                query_type = self._determine_query_type(intent_flags, symbols)
+        else:
+            # Determine primary query type
+            query_type = self._determine_query_type(intent_flags, symbols)
         
         # Use LLM for advanced classification if available
         if self.llm_client:
@@ -89,7 +130,7 @@ class QueryIntentClassifier:
             "original_query": query
         }
         
-        logger.info(f"Classified query: type={query_type}, flags={intent_flags}")
+        logger.info(f"Classified query: type={query_type}, flags={intent_flags}, symbols={symbols}")
         return result
     
     def _is_comparison_query(self, query_lower: str, symbols: List[str]) -> bool:
