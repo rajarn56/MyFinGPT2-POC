@@ -1,4 +1,4 @@
-"""Embedding pipeline for Phase 4 Knowledge Layer"""
+"""Embedding pipeline for Phase 4 Knowledge Layer with Phase 9 caching"""
 
 import os
 from typing import List, Optional
@@ -6,12 +6,18 @@ from loguru import logger
 import litellm
 
 from src.config import settings
+from src.utils.cache import EmbeddingCache
 
 
 class EmbeddingPipeline:
-    """Handles embedding generation for vector database"""
+    """Handles embedding generation for vector database with caching"""
     
-    def __init__(self, provider: Optional[str] = None, model: Optional[str] = None):
+    def __init__(
+        self,
+        provider: Optional[str] = None,
+        model: Optional[str] = None,
+        embedding_cache: Optional[EmbeddingCache] = None
+    ):
         """
         Initialize embedding pipeline
         
@@ -20,6 +26,7 @@ class EmbeddingPipeline:
                      If None, uses EMBEDDING_PROVIDER env var or falls back to LLM provider
             model: Embedding model name (e.g., "text-embedding-ada-002" for OpenAI)
                    If None, uses EMBEDDING_MODEL env var or provider default
+            embedding_cache: Optional embedding cache instance (created if not provided)
         """
         # Determine provider
         embedding_provider = os.getenv("EMBEDDING_PROVIDER", "")
@@ -49,14 +56,21 @@ class EmbeddingPipeline:
         # Cache for detected embedding dimension
         self._cached_dimension: Optional[int] = None
         
+        # Initialize embedding cache (Phase 9)
+        self.embedding_cache = embedding_cache or EmbeddingCache(
+            max_size=10000,
+            ttl_hours=24 * 7  # 7 days
+        )
+        
         logger.info(f"Initialized EmbeddingPipeline: provider={self.provider}, model={self.embedding_model}")
     
-    def generate_embedding(self, text: str) -> List[float]:
+    def generate_embedding(self, text: str, use_cache: bool = True) -> List[float]:
         """
-        Generate embedding for text
+        Generate embedding for text (with caching)
         
         Args:
             text: Text to embed
+            use_cache: Whether to use cache (default: True)
             
         Returns:
             Embedding vector (list of floats)
@@ -65,15 +79,28 @@ class EmbeddingPipeline:
             logger.warning("Empty text provided for embedding")
             return []
         
+        # Check cache first (Phase 9)
+        if use_cache:
+            cached_embedding = self.embedding_cache.get(text)
+            if cached_embedding is not None:
+                logger.debug(f"Cache hit for embedding: {text[:50]}...")
+                return cached_embedding
+        
         try:
             if self.provider == "lmstudio":
-                return self._generate_lmstudio_embedding(text)
+                embedding = self._generate_lmstudio_embedding(text)
             elif self.provider == "openai":
-                return self._generate_openai_embedding(text)
+                embedding = self._generate_openai_embedding(text)
             else:
                 # Default to OpenAI
                 logger.warning(f"Unknown provider {self.provider}, falling back to OpenAI")
-                return self._generate_openai_embedding(text)
+                embedding = self._generate_openai_embedding(text)
+            
+            # Cache the result (Phase 9)
+            if use_cache and embedding:
+                self.embedding_cache.set(text, embedding)
+            
+            return embedding
         except Exception as e:
             logger.error(f"Error generating embedding: {e}")
             raise
@@ -138,12 +165,19 @@ class EmbeddingPipeline:
             logger.error(f"OpenAI embedding failed: {e}")
             raise
     
-    def generate_batch_embeddings(self, texts: List[str]) -> List[List[float]]:
+    def generate_batch_embeddings(
+        self,
+        texts: List[str],
+        use_cache: bool = True,
+        batch_size: int = 100
+    ) -> List[List[float]]:
         """
-        Generate embeddings for multiple texts (batch processing)
+        Generate embeddings for multiple texts (batch processing with caching)
         
         Args:
             texts: List of texts to embed
+            use_cache: Whether to use cache (default: True)
+            batch_size: Batch size for API calls (default: 100)
             
         Returns:
             List of embedding vectors
@@ -152,14 +186,63 @@ class EmbeddingPipeline:
             return []
         
         embeddings = []
-        for text in texts:
-            try:
-                embedding = self.generate_embedding(text)
-                embeddings.append(embedding)
-            except Exception as e:
-                logger.error(f"Error generating embedding for text: {e}")
-                # Add empty embedding as fallback
-                embeddings.append([])
+        
+        # Process in batches for better performance (Phase 9)
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            
+            # Check cache for batch
+            batch_embeddings = []
+            texts_to_embed = []
+            indices_to_embed = []
+            
+            for idx, text in enumerate(batch):
+                if use_cache:
+                    cached = self.embedding_cache.get(text)
+                    if cached is not None:
+                        batch_embeddings.append((idx, cached))
+                        continue
+                
+                texts_to_embed.append(text)
+                indices_to_embed.append(idx)
+            
+            # Generate embeddings for uncached texts
+            if texts_to_embed:
+                try:
+                    # Use litellm batch embedding if available
+                    if self.provider == "openai":
+                        response = litellm.embedding(
+                            model=self.embedding_model,
+                            input=texts_to_embed
+                        )
+                        
+                        if response and response.data:
+                            for idx, text in zip(indices_to_embed, texts_to_embed):
+                                embedding = response.data[indices_to_embed.index(idx)]["embedding"]
+                                batch_embeddings.append((idx, embedding))
+                                
+                                # Cache the result
+                                if use_cache:
+                                    self.embedding_cache.set(text, embedding)
+                    else:
+                        # Fall back to individual calls
+                        for idx, text in zip(indices_to_embed, texts_to_embed):
+                            embedding = self.generate_embedding(text, use_cache=use_cache)
+                            batch_embeddings.append((idx, embedding))
+                except Exception as e:
+                    logger.error(f"Error generating batch embeddings: {e}")
+                    # Fall back to individual calls
+                    for idx, text in zip(indices_to_embed, texts_to_embed):
+                        try:
+                            embedding = self.generate_embedding(text, use_cache=use_cache)
+                            batch_embeddings.append((idx, embedding))
+                        except Exception as e2:
+                            logger.error(f"Error generating embedding for text: {e2}")
+                            batch_embeddings.append((idx, []))
+            
+            # Sort by original index and extract embeddings
+            batch_embeddings.sort(key=lambda x: x[0])
+            embeddings.extend([emb for _, emb in batch_embeddings])
         
         return embeddings
     

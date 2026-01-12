@@ -4,7 +4,7 @@ from loguru import logger
 import uvicorn
 
 from src.utils.logging import setup_logging
-from src.api.routers import health, auth, agents, knowledge, edgar, websocket
+from src.api.routers import health, auth, agents, knowledge, edgar, websocket, performance
 from src.api.middleware.error_handler import error_handler
 from src.config import settings
 from src.exceptions import MyFinGPTException
@@ -38,6 +38,7 @@ app.include_router(agents.router, prefix="/api/agents", tags=["agents"])
 app.include_router(knowledge.router, prefix="/api/knowledge", tags=["knowledge"])  # Phase 4
 app.include_router(edgar.router, prefix="/api/edgar", tags=["edgar"])  # Phase 5
 app.include_router(websocket.router, tags=["websocket"])  # Phase 7: WebSocket for progress updates
+app.include_router(performance.router, prefix="/api/performance", tags=["performance"])  # Phase 9: Performance monitoring
 
 # Add exception handlers
 app.add_exception_handler(MyFinGPTException, error_handler)

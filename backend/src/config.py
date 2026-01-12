@@ -42,6 +42,12 @@ class Settings(BaseSettings):
     # Default embedding models by provider (used if EMBEDDING_MODEL not set)
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-ada-002"  # OpenAI default
     
+    # Cache Configuration (for Phase 9+)
+    EMBEDDING_CACHE_SIZE: int = 10000  # Max cached embeddings
+    EMBEDDING_CACHE_TTL_HOURS: int = 24 * 7  # 7 days TTL
+    QUERY_CACHE_SIZE: int = 1000  # Max cached queries
+    QUERY_CACHE_TTL_HOURS: int = 1  # 1 hour TTL
+    
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     

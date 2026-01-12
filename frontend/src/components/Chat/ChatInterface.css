@@ -1,0 +1,35 @@
+.chat-interface {
+  position: relative;
+}
+
+.chat-interface__header {
+  flex-shrink: 0;
+}
+
+.chat-interface__progress-toggle {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  background: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-interface__progress-toggle:hover {
+  background: #0056b3;
+}
+
+.chat-interface__progress {
+  border-bottom: 1px solid #dee2e6;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .chat-interface__progress {
+    max-height: 200px;
+  }
+}

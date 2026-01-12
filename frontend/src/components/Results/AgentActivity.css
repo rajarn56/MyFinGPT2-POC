@@ -108,3 +108,114 @@
   font-weight: 600;
   color: #007bff;
 }
+
+/* Execution Timeline */
+.agent-activity__timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.agent-activity__timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #dee2e6;
+}
+
+.agent-activity__timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.agent-activity__timeline-marker {
+  position: absolute;
+  left: -1.75rem;
+  top: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 2px solid;
+  background: #ffffff;
+}
+
+.agent-activity__timeline-item--completed .agent-activity__timeline-marker {
+  background: #28a745;
+  border-color: #28a745;
+  color: #ffffff;
+}
+
+.agent-activity__timeline-item--failed .agent-activity__timeline-marker {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
+}
+
+.agent-activity__timeline-item--running .agent-activity__timeline-marker {
+  background: #007bff;
+  border-color: #007bff;
+  color: #ffffff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.agent-activity__timeline-content {
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  border-left: 3px solid #dee2e6;
+}
+
+.agent-activity__timeline-item--completed .agent-activity__timeline-content {
+  border-left-color: #28a745;
+}
+
+.agent-activity__timeline-item--failed .agent-activity__timeline-content {
+  border-left-color: #dc3545;
+}
+
+.agent-activity__timeline-item--running .agent-activity__timeline-content {
+  border-left-color: #007bff;
+  background: #e7f3ff;
+}
+
+.agent-activity__timeline-agent {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #212529;
+}
+
+.agent-activity__timeline-time {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .agent-activity__timeline {
+    padding-left: 1.5rem;
+  }
+
+  .agent-activity__timeline-marker {
+    left: -1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.625rem;
+  }
+}

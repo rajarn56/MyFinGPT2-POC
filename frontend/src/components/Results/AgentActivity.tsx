@@ -5,6 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { ExecuteResponse } from '../../types';
+import { useAppContext } from '../../context/AppContext';
 import './AgentActivity.css';
 
 interface AgentActivityProps {
@@ -16,9 +17,18 @@ interface AgentActivityData {
   token_usage: Record<string, number>;
   execution_time: Record<string, number>;
   context_size?: number;
+  execution_timeline?: Array<{
+    agent: string;
+    start_time: string;
+    end_time?: string;
+    status: 'running' | 'completed' | 'failed';
+    duration?: number;
+  }>;
 }
 
 export const AgentActivity: React.FC<AgentActivityProps> = ({ analysis }) => {
+  const { progress } = useAppContext();
+
   const activityData = useMemo<AgentActivityData>(() => {
     const tokenUsage = analysis.result.token_usage || {};
     const agents = Object.keys(tokenUsage);
@@ -40,13 +50,41 @@ export const AgentActivity: React.FC<AgentActivityProps> = ({ analysis }) => {
     // Estimate context size from total tokens (rough approximation: 1 token ≈ 4 characters)
     const estimatedContextSize = totalTokens * 4;
 
+    // Extract execution timeline from progress if available
+    let executionTimeline: AgentActivityData['execution_timeline'] = undefined;
+    if (progress?.execution_order) {
+      executionTimeline = progress.execution_order.map(entry => {
+        const startTime = new Date(entry.start_time);
+        const endTime = entry.end_time ? new Date(entry.end_time) : undefined;
+        const duration = endTime 
+          ? (endTime.getTime() - startTime.getTime()) / 1000 
+          : undefined;
+
+        return {
+          ...entry,
+          duration,
+        };
+      });
+    }
+
+    // Calculate execution times from timeline
+    const executionTime: Record<string, number> = {};
+    if (executionTimeline) {
+      executionTimeline.forEach(entry => {
+        if (entry.duration !== undefined) {
+          executionTime[entry.agent] = entry.duration;
+        }
+      });
+    }
+
     return {
       agents_executed: agents.length > 0 ? agents : [],
       token_usage: tokenUsagePerAgent,
-      execution_time: {}, // Not available in current API response
+      execution_time: executionTime,
       context_size: estimatedContextSize,
+      execution_timeline: executionTimeline,
     };
-  }, [analysis]);
+  }, [analysis, progress]);
 
   const formatTime = (seconds: number) => {
     if (seconds < 1) {
@@ -153,6 +191,35 @@ export const AgentActivity: React.FC<AgentActivityProps> = ({ analysis }) => {
             <div className="agent-activity__section-title">Estimated Context Size</div>
             <div className="agent-activity__context-size">
               {formatBytes(activityData.context_size)}
+            </div>
+          </div>
+        )}
+
+        {/* Execution Timeline */}
+        {activityData.execution_timeline && activityData.execution_timeline.length > 0 && (
+          <div className="agent-activity__section">
+            <div className="agent-activity__section-title">Execution Timeline</div>
+            <div className="agent-activity__timeline">
+              {activityData.execution_timeline.map((entry, index) => (
+                <div
+                  key={`${entry.agent}-${index}`}
+                  className={`agent-activity__timeline-item agent-activity__timeline-item--${entry.status}`}
+                >
+                  <div className="agent-activity__timeline-marker">
+                    {entry.status === 'completed' && '✓'}
+                    {entry.status === 'failed' && '✗'}
+                    {entry.status === 'running' && '⟳'}
+                  </div>
+                  <div className="agent-activity__timeline-content">
+                    <div className="agent-activity__timeline-agent">{entry.agent}</div>
+                    <div className="agent-activity__timeline-time">
+                      {new Date(entry.start_time).toLocaleTimeString()}
+                      {entry.end_time && ` - ${new Date(entry.end_time).toLocaleTimeString()}`}
+                      {entry.duration !== undefined && ` (${formatTime(entry.duration)})`}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
