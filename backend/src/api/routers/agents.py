@@ -236,12 +236,13 @@ async def execute_agents(
         }
     
     # Create initial state (Phase 3: includes analyst_data and report fields, Phase 5: includes edgar_data, Phase 6: includes comparison_data and trend_analysis)
+    # IMPORTANT: Ensure all fields match AgentState TypedDict exactly
     now = datetime.utcnow()
     state = {
         "transaction_id": transaction_id,
         "session_id": x_session_id,
         "query": request.query,
-        "symbols": final_symbols,  # Use parsed symbols
+        "symbols": final_symbols if final_symbols else [],  # Ensure it's a list, not None
         "research_data": {},
         "analyst_data": {},  # Phase 3
         "report": None,  # Phase 3
@@ -249,14 +250,27 @@ async def execute_agents(
         "comparison_data": {},  # Phase 6
         "trend_analysis": {},  # Phase 6
         "query_type": parsed_intent_type,  # Use parsed intent type
-        "intent_flags": parsed_intent_flags,  # Add parsed intent flags
-        "entities": parsed_entities,  # Add parsed entities (timeframes, metrics, filing types)
+        "intent_flags": parsed_intent_flags if parsed_intent_flags else {},  # Ensure it's a dict
+        "entities": parsed_entities if parsed_entities else {},  # Ensure it's a dict
         "errors": [],
         "token_usage": {},
         "citations": [],
         "created_at": now,
         "updated_at": now
     }
+    
+    # Validate state before passing to workflow
+    logger.info(
+        f"Created initial state for transaction {transaction_id}: "
+        f"query='{request.query}', symbols={final_symbols}, intent={parsed_intent_type}, "
+        f"state_keys={list(state.keys())}, "
+        f"symbols_type={type(state['symbols'])}, symbols_value={state['symbols']}"
+    )
+    
+    # Ensure symbols is a list (not None, not empty string)
+    if not isinstance(state["symbols"], list):
+        logger.error(f"symbols is not a list! Type: {type(state['symbols'])}, Value: {state['symbols']}")
+        state["symbols"] = []
     
     logger.info(
         f"Executing agent workflow for transaction {transaction_id}: "
@@ -265,6 +279,25 @@ async def execute_agents(
     
     # Phase 7: Create progress tracker for WebSocket updates
     progress_tracker = progress_manager.create_tracker(x_session_id, transaction_id)
+    
+    # Final validation before executing workflow
+    logger.info(
+        f"Final state validation before workflow execution - "
+        f"transaction_id={state.get('transaction_id')}, "
+        f"query='{state.get('query', '')}', "
+        f"symbols={state.get('symbols', [])}, "
+        f"symbols_type={type(state.get('symbols'))}, "
+        f"all_keys={list(state.keys())}"
+    )
+    
+    # Ensure critical fields are present and correct type
+    if not state.get("transaction_id"):
+        raise ValueError(f"Missing transaction_id in state! Keys: {list(state.keys())}")
+    if not state.get("query"):
+        raise ValueError(f"Missing query in state! Keys: {list(state.keys())}")
+    if not isinstance(state.get("symbols"), list):
+        logger.error(f"symbols is not a list! Type: {type(state.get('symbols'))}, Value: {state.get('symbols')}")
+        state["symbols"] = []
     
     try:
         # Execute workflow with progress tracking

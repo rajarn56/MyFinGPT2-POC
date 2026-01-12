@@ -43,12 +43,26 @@ class ResearchAgent(BaseAgent):
         
         self.log_execution(state)
         
+        # Add detailed logging of state received
+        logger.info(
+            f"[ResearchAgent] State received - "
+            f"transaction_id={state.get('transaction_id')}, "
+            f"query='{state.get('query', '')}', "
+            f"symbols={state.get('symbols', [])}, "
+            f"state_keys={list(state.keys())}"
+        )
+        
         symbols = state.get("symbols", [])
         query = state.get("query", "")
         
         # Validate symbols - if empty, try to extract from query
         if not symbols or len(symbols) == 0:
-            logger.warning(f"ResearchAgent received empty symbols list for query: {query}")
+            logger.warning(
+                f"ResearchAgent received empty symbols list - "
+                f"query='{query}', "
+                f"transaction_id={state.get('transaction_id')}, "
+                f"state_keys={list(state.keys())}"
+            )
             
             # Try to extract symbols from query using parser
             try:

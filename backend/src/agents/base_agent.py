@@ -55,4 +55,10 @@ class BaseAgent(ABC):
         Args:
             state: AgentState dictionary
         """
-        logger.info(f"{self.name} executing for transaction {state.get('transaction_id')}")
+        transaction_id = state.get('transaction_id', 'MISSING')
+        query = state.get('query', '')
+        symbols = state.get('symbols', [])
+        logger.info(
+            f"{self.name} executing for transaction {transaction_id} - "
+            f"query='{query[:50]}', symbols={symbols}"
+        )

@@ -192,6 +192,16 @@ class MyFinGPTWorkflow:
             Updated AgentState dictionary
         """
         agent_name = "ResearchAgent"
+        
+        # Add comprehensive logging to debug state issues
+        logger.info(
+            f"[{agent_name}] Node received state - "
+            f"transaction_id={state.get('transaction_id')}, "
+            f"query={state.get('query', '')[:50]}, "
+            f"symbols={state.get('symbols', [])}, "
+            f"state_keys={list(state.keys())}"
+        )
+        
         try:
             if self.progress_tracker:
                 self.progress_tracker.start_agent(agent_name, ["Gathering market data", "Fetching company information"])
@@ -200,6 +210,7 @@ class MyFinGPTWorkflow:
                 self.progress_tracker.complete_agent(agent_name)
             return result
         except Exception as e:
+            logger.error(f"[{agent_name}] Execution failed: {e}", exc_info=True)
             if self.progress_tracker:
                 self.progress_tracker.fail_agent(agent_name, str(e))
             raise
@@ -215,15 +226,33 @@ class MyFinGPTWorkflow:
             Updated AgentState dictionary with merged results
         """
         agent_name = "ResearchAgent"
+        
+        # Add comprehensive logging to debug state issues
+        logger.info(
+            f"[{agent_name}] Parallel node received state - "
+            f"transaction_id={state.get('transaction_id')}, "
+            f"query={state.get('query', '')[:50]}, "
+            f"symbols={state.get('symbols', [])}, "
+            f"state_keys={list(state.keys())}"
+        )
+        
         symbols = state.get("symbols", [])
+        query = state.get("query", "")
+        
+        # Validate state before proceeding
+        if not query:
+            logger.error(f"[{agent_name}] Empty query in state! State keys: {list(state.keys())}")
+        if not symbols:
+            logger.error(f"[{agent_name}] Empty symbols in state! Query: '{query}', State keys: {list(state.keys())}")
         
         try:
             if self.progress_tracker:
-                tasks = [f"Gathering data for {symbol}" for symbol in symbols]
+                tasks = [f"Gathering data for {symbol}" for symbol in symbols] if symbols else ["Gathering market data"]
                 self.progress_tracker.start_agent(agent_name, tasks)
             
             if len(symbols) <= 1:
                 # Single symbol, no need for parallel execution
+                logger.info(f"[{agent_name}] Executing for single symbol: {symbols}")
                 result = self.research_agent.execute(state)
                 if self.progress_tracker:
                     self.progress_tracker.complete_agent(agent_name)
@@ -455,12 +484,57 @@ class MyFinGPTWorkflow:
         # Set progress tracker for this execution
         self.progress_tracker = progress_tracker
         
-        logger.info(f"Executing workflow for transaction {state.get('transaction_id')}")
+        transaction_id = state.get('transaction_id')
+        query = state.get('query', '')
+        symbols = state.get('symbols', [])
+        
+        # Log initial state before invoking graph
+        logger.info(
+            f"Executing workflow for transaction {transaction_id} - "
+            f"query='{query}', symbols={symbols}, "
+            f"state_keys={list(state.keys())}, "
+            f"state_size={len(str(state))} bytes"
+        )
+        
+        # Validate critical fields are present
+        if not transaction_id:
+            logger.error(f"Missing transaction_id in state! State keys: {list(state.keys())}")
+        if not query:
+            logger.error(f"Missing query in state! State keys: {list(state.keys())}")
+        if not symbols:
+            logger.warning(f"Empty symbols list in state! Query: '{query}'")
         
         try:
+            # Log state immediately before invoke
+            logger.info(
+                f"[WORKFLOW] About to invoke graph - "
+                f"state_transaction_id={state.get('transaction_id')}, "
+                f"state_query='{state.get('query', '')}', "
+                f"state_symbols={state.get('symbols', [])}, "
+                f"state_symbols_type={type(state.get('symbols'))}, "
+                f"state_keys={list(state.keys())}, "
+                f"state_dict_repr={str(state)[:200]}"
+            )
+            
             result = self.graph.invoke(state)
-            logger.info(f"Workflow completed for transaction {state.get('transaction_id')}")
+            
+            # Log result state immediately after invoke
+            logger.info(
+                f"[WORKFLOW] Graph invoke completed - "
+                f"result_transaction_id={result.get('transaction_id')}, "
+                f"result_query='{result.get('query', '')}', "
+                f"result_symbols={result.get('symbols', [])}, "
+                f"result_keys={list(result.keys())}, "
+                f"result_research_data_keys={list(result.get('research_data', {}).keys())}"
+            )
+            
             return result
+        except Exception as e:
+            logger.error(
+                f"Workflow execution failed for transaction {transaction_id}: {e}",
+                exc_info=True
+            )
+            raise
         finally:
             # Clean up progress tracker
             self.progress_tracker = None
