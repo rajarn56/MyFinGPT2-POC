@@ -1,75 +1,158 @@
-2026-01-11 18:08:37 | INFO     | __main__:startup_event:49 - Starting MyFinGPT-POC-V2 backend
-2026-01-11 18:08:37 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
-2026-01-11 18:08:37 | INFO     | src.graph_db.schema:initialize_schema:23 - Initializing Neo4j schema for Phase 4...
-2026-01-11 18:08:37 | INFO     | src.graph_db.schema:initialize_schema:32 - Neo4j schema initialized successfully
-2026-01-11 18:08:37 | INFO     | __main__:startup_event:60 - Neo4j schema initialized
-2026-01-11 18:08:37 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:initialize_schema:35 - Initializing EDGAR Neo4j schema...
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: textChunkEmbeddings (General text content)
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: riskChunkEmbeddings (Risk factor discussions)
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: financialChunkEmbeddings (Financial analysis)
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: strategyChunkEmbeddings (Strategic/forward-looking content)
-2026-01-11 18:08:37 | INFO     | src.graph_db.edgar_schema:initialize_schema:47 - EDGAR Neo4j schema initialized successfully
-2026-01-11 18:08:37 | INFO     | __main__:startup_event:68 - EDGAR Neo4j schema initialized (embedding dimension: 768)
-2026-01-11 18:08:51 | INFO     | src.services.progress_manager:connect:127 - WebSocket connected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao (total: 1)
-2026-01-11 18:08:59 | INFO     | src.mcp.mcp_client:__init__:27 - Initialized MCPClient (server_url=None)
-2026-01-11 18:08:59 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
-2026-01-11 18:08:59 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized ResearchAgent
-2026-01-11 18:08:59 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized AnalystAgent
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized ReportingAgent
-2026-01-11 18:08:59 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
-2026-01-11 18:08:59 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized EdgarAgent
-2026-01-11 18:08:59 | INFO     | src.agents.edgar_agent:_initialize_edgartools:61 - Set EDGAR identity: rajarn56@outlook.com
-2026-01-11 18:08:59 | INFO     | src.agents.edgar_agent:_initialize_edgartools:67 - Successfully initialized edgartools
-2026-01-11 18:08:59 | INFO     | src.api.routers.agents:get_workflow:104 - EDGAR Agent initialized successfully
-2026-01-11 18:08:59 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized ComparisonAgent
-2026-01-11 18:08:59 | INFO     | src.agents.base_agent:__init__:19 - Initialized TrendAgent
-2026-01-11 18:08:59 | INFO     | src.api.routers.agents:get_workflow:119 - Comparison and Trend agents initialized successfully
-2026-01-11 18:08:59 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-11 18:08:59 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
-2026-01-11 18:08:59 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-11 18:08:59 | INFO     | src.utils.query_intent:__init__:49 - Initialized QueryIntentClassifier
-2026-01-11 18:08:59 | INFO     | src.orchestrator.workflow:_build_graph:127 - LangGraph workflow compiled successfully
-2026-01-11 18:08:59 | INFO     | src.orchestrator.workflow:__init__:73 - MyFinGPTWorkflow initialized (Phase 5: edgar=True, Phase 6: comparison=True, trend=True, parallel=True, conditional=True)
-2026-01-11 18:08:59 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-11 18:08:59 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
-2026-01-11 18:08:59 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
-2026-01-11 18:08:59 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
-2026-01-11 18:08:59 | INFO     | src.api.routers.agents:execute_agents:200 - Parsing query: Analyze AAPL...
-2026-01-11 18:09:02 | INFO     | src.utils.query_parser:parse:94 - LLM extraction succeeded: symbols=['AAPL'], intent=analysis
-2026-01-11 18:09:02 | INFO     | src.api.routers.agents:execute_agents:218 - Query parsing completed: method=llm, symbols=['AAPL'], intent=analysis, entities={'timeframe': None, 'metrics': [], 'filing_type': None, 'filing_year': None}, needs_clarification=False
-2026-01-11 18:09:02 | INFO     | src.api.routers.agents:execute_agents:263 - Created initial state for transaction txn_b8e7824929514865: query='Analyze AAPL', symbols=['AAPL'], intent=analysis, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], symbols_type=<class 'list'>, symbols_value=['AAPL']
-2026-01-11 18:09:02 | INFO     | src.api.routers.agents:execute_agents:275 - Executing agent workflow for transaction txn_b8e7824929514865: query='Analyze AAPL', symbols=['AAPL'], intent=analysis
-2026-01-11 18:09:02 | INFO     | src.api.routers.agents:execute_agents:284 - Final state validation before workflow execution - transaction_id=txn_b8e7824929514865, query='Analyze AAPL', symbols=['AAPL'], symbols_type=<class 'list'>, all_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:execute:492 - Executing workflow for transaction txn_b8e7824929514865 - query='Analyze AAPL', symbols=['AAPL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_size=744 bytes
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:execute:509 - [WORKFLOW] About to invoke graph - state_transaction_id=txn_b8e7824929514865, state_query='Analyze AAPL', state_symbols=['AAPL'], state_symbols_type=<class 'list'>, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_dict_repr={'transaction_id': 'txn_b8e7824929514865', 'session_id': 'HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao', 'query': 'Analyze AAPL', 'symbols': ['AAPL'], 'research_data': {}, 'analyst_data': {}, 'report':
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:_research_parallel_node:231 - [ResearchAgent] Parallel node received state - transaction_id=, query=, symbols=[], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | ERROR    | src.orchestrator.workflow:_research_parallel_node:244 - [ResearchAgent] Empty query in state! State keys: ['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | ERROR    | src.orchestrator.workflow:_research_parallel_node:246 - [ResearchAgent] Empty symbols in state! Query: '', State keys: ['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:_research_parallel_node:255 - [ResearchAgent] Executing for single symbol: []
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - ResearchAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | INFO     | src.agents.research_agent:execute:47 - [ResearchAgent] State received - transaction_id=, query='', symbols=[], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | WARNING  | src.agents.research_agent:execute:60 - ResearchAgent received empty symbols list - query='', transaction_id=, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
-2026-01-11 18:09:02 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
-2026-01-11 18:09:02 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
-2026-01-11 18:09:02 | WARNING  | src.utils.query_parser:parse:83 - Empty query provided to parser
-2026-01-11 18:09:02 | ERROR    | src.agents.research_agent:execute:86 - No stock symbols found in query: ''. Please provide a stock symbol (e.g., 'AAPL') or company name (e.g., 'Apple').
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - EdgarAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | INFO     | src.agents.edgar_agent:execute:97 - Query doesn't require EDGAR data, skipping
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - AnalystAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | WARNING  | src.agents.analyst_agent:execute:53 - No research data available for analysis
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:_route_advanced_agents:442 - Using pre-parsed query type: analysis
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - ComparisonAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | WARNING  | src.agents.comparison_agent:execute:64 - No research data available for comparison
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - TrendAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | WARNING  | src.agents.trend_agent:execute:62 - No research data available for trend analysis
-2026-01-11 18:09:02 | INFO     | src.agents.base_agent:log_execution:61 - ReportingAgent executing for transaction  - query='', symbols=[]
-2026-01-11 18:09:02 | WARNING  | src.agents.reporting_agent:execute:60 - No data available for report generation
-2026-01-11 18:09:02 | INFO     | src.orchestrator.workflow:execute:522 - [WORKFLOW] Graph invoke completed - result_transaction_id=, result_query='', result_symbols=[], result_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], result_research_data_keys=[]
-2026-01-11 18:09:40 | INFO     | src.api.routers.websocket:websocket_progress:31 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
-2026-01-11 18:09:40 | INFO     | src.services.progress_manager:disconnect:143 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
-2026-01-11 18:09:40 | INFO     | __main__:shutdown_event:78 - Shutting down MyFinGPT-POC-V2 backend
+2026-01-11 18:12:39 | INFO     | __main__:startup_event:49 - Starting MyFinGPT-POC-V2 backend
+2026-01-11 18:12:39 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-11 18:12:39 | INFO     | src.graph_db.schema:initialize_schema:23 - Initializing Neo4j schema for Phase 4...
+2026-01-11 18:12:39 | INFO     | src.graph_db.schema:initialize_schema:32 - Neo4j schema initialized successfully
+2026-01-11 18:12:39 | INFO     | __main__:startup_event:60 - Neo4j schema initialized
+2026-01-11 18:12:39 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:initialize_schema:35 - Initializing EDGAR Neo4j schema...
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: textChunkEmbeddings (General text content)
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: riskChunkEmbeddings (Risk factor discussions)
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: financialChunkEmbeddings (Financial analysis)
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:_create_vector_indexes:132 - Created vector index: strategyChunkEmbeddings (Strategic/forward-looking content)
+2026-01-11 18:12:39 | INFO     | src.graph_db.edgar_schema:initialize_schema:47 - EDGAR Neo4j schema initialized successfully
+2026-01-11 18:12:39 | INFO     | __main__:startup_event:68 - EDGAR Neo4j schema initialized (embedding dimension: 768)
+2026-01-11 18:12:50 | INFO     | src.services.progress_manager:connect:127 - WebSocket connected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao (total: 1)
+2026-01-11 18:12:52 | INFO     | src.api.routers.websocket:websocket_progress:31 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:12:52 | INFO     | src.services.progress_manager:disconnect:143 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:12:52 | INFO     | src.services.progress_manager:connect:127 - WebSocket connected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao (total: 1)
+2026-01-11 18:13:00 | INFO     | src.api.routers.websocket:websocket_progress:31 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:13:00 | INFO     | src.services.progress_manager:disconnect:143 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:13:02 | INFO     | src.services.progress_manager:connect:127 - WebSocket connected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao (total: 1)
+2026-01-11 18:13:07 | INFO     | src.mcp.mcp_client:__init__:27 - Initialized MCPClient (server_url=None)
+2026-01-11 18:13:07 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:13:07 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized ResearchAgent
+2026-01-11 18:13:07 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized AnalystAgent
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized ReportingAgent
+2026-01-11 18:13:07 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-11 18:13:07 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized EdgarAgent
+2026-01-11 18:13:07 | INFO     | src.agents.edgar_agent:_initialize_edgartools:61 - Set EDGAR identity: rajarn56@outlook.com
+2026-01-11 18:13:07 | INFO     | src.agents.edgar_agent:_initialize_edgartools:67 - Successfully initialized edgartools
+2026-01-11 18:13:07 | INFO     | src.api.routers.agents:get_workflow:104 - EDGAR Agent initialized successfully
+2026-01-11 18:13:07 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized ComparisonAgent
+2026-01-11 18:13:07 | INFO     | src.agents.base_agent:__init__:19 - Initialized TrendAgent
+2026-01-11 18:13:07 | INFO     | src.api.routers.agents:get_workflow:119 - Comparison and Trend agents initialized successfully
+2026-01-11 18:13:07 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:13:07 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
+2026-01-11 18:13:07 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:13:07 | INFO     | src.utils.query_intent:__init__:49 - Initialized QueryIntentClassifier
+2026-01-11 18:13:07 | INFO     | src.orchestrator.workflow:_build_graph:127 - LangGraph workflow compiled successfully
+2026-01-11 18:13:07 | INFO     | src.orchestrator.workflow:__init__:73 - MyFinGPTWorkflow initialized (Phase 5: edgar=True, Phase 6: comparison=True, trend=True, parallel=True, conditional=True)
+2026-01-11 18:13:07 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:13:07 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
+2026-01-11 18:13:07 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:13:07 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:13:07 | INFO     | src.api.routers.agents:execute_agents:200 - Parsing query: Analyze AAPL...
+2026-01-11 18:13:10 | INFO     | src.utils.query_parser:parse:94 - LLM extraction succeeded: symbols=['AAPL'], intent=analysis
+2026-01-11 18:13:10 | INFO     | src.api.routers.agents:execute_agents:218 - Query parsing completed: method=llm, symbols=['AAPL'], intent=analysis, entities={'timeframe': None, 'metrics': [], 'filing_type': None, 'filing_year': None}, needs_clarification=False
+2026-01-11 18:13:10 | INFO     | src.api.routers.agents:execute_agents:263 - Created initial state for transaction txn_b8c9ee482a0c4e46: query='Analyze AAPL', symbols=['AAPL'], intent=analysis, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], symbols_type=<class 'list'>, symbols_value=['AAPL']
+2026-01-11 18:13:10 | INFO     | src.api.routers.agents:execute_agents:275 - Executing agent workflow for transaction txn_b8c9ee482a0c4e46: query='Analyze AAPL', symbols=['AAPL'], intent=analysis
+2026-01-11 18:13:10 | INFO     | src.api.routers.agents:execute_agents:284 - Final state validation before workflow execution - transaction_id=txn_b8c9ee482a0c4e46, query='Analyze AAPL', symbols=['AAPL'], symbols_type=<class 'list'>, all_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:13:10 | INFO     | src.orchestrator.workflow:execute:492 - Executing workflow for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_size=750 bytes
+2026-01-11 18:13:10 | INFO     | src.orchestrator.workflow:execute:509 - [WORKFLOW] About to invoke graph - state_transaction_id=txn_b8c9ee482a0c4e46, state_query='Analyze AAPL', state_symbols=['AAPL'], state_symbols_type=<class 'list'>, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_dict_repr={'transaction_id': 'txn_b8c9ee482a0c4e46', 'session_id': 'HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao', 'query': 'Analyze AAPL', 'symbols': ['AAPL'], 'research_data': {}, 'analyst_data': {}, 'report':
+2026-01-11 18:13:10 | INFO     | src.orchestrator.workflow:_research_parallel_node:231 - [ResearchAgent] Parallel node received state - transaction_id=txn_b8c9ee482a0c4e46, query=Analyze AAPL, symbols=['AAPL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:13:10 | INFO     | src.orchestrator.workflow:_research_parallel_node:255 - [ResearchAgent] Executing for single symbol: ['AAPL']
+2026-01-11 18:13:10 | INFO     | src.agents.base_agent:log_execution:61 - ResearchAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:10 | INFO     | src.agents.research_agent:execute:47 - [ResearchAgent] State received - transaction_id=txn_b8c9ee482a0c4e46, query='Analyze AAPL', symbols=['AAPL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:13:10 | INFO     | src.agents.research_agent:execute:108 - ResearchAgent processing 1 symbol(s): ['AAPL']
+2026-01-11 18:13:10 | INFO     | src.services.ingestion_service:ingest_news_article:82 - Ingested news article: Company Information: Apple Inc.... (ID: caf72945-aab2-4d0e-bcb7-4d30c0bdb4f3)
+2026-01-11 18:13:10 | INFO     | src.agents.research_agent:execute:155 - Successfully fetched data for AAPL
+2026-01-11 18:13:10 | INFO     | src.agents.base_agent:log_execution:61 - EdgarAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:10 | INFO     | src.agents.edgar_agent:execute:104 - Fetching EDGAR data for AAPL
+2026-01-11 18:13:12 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-25-000079 (10-K)
+2026-01-11 18:13:13 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-24-000123 (10-K)
+2026-01-11 18:13:13 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-23-000106 (10-K)
+2026-01-11 18:13:14 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-22-000108 (10-K)
+2026-01-11 18:13:14 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-21-000105 (10-K)
+2026-01-11 18:13:15 | INFO     | src.agents.base_agent:log_execution:61 - AnalystAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:23 | INFO     | src.agents.analyst_agent:execute:66 - Completed analysis for AAPL
+2026-01-11 18:13:23 | INFO     | src.orchestrator.workflow:_route_advanced_agents:442 - Using pre-parsed query type: analysis
+2026-01-11 18:13:23 | INFO     | src.agents.base_agent:log_execution:61 - ComparisonAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:23 | INFO     | src.agents.base_agent:log_execution:61 - TrendAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:23 | INFO     | src.agents.comparison_agent:execute:69 - Single symbol detected, performing benchmark comparison
+2026-01-11 18:13:23 | WARNING  | src.agents.trend_agent:_analyze_trend:111 - Insufficient historical data for AAPL, using basic trend analysis
+2026-01-11 18:13:39 | INFO     | src.agents.trend_agent:execute:75 - Completed trend analysis for AAPL
+2026-01-11 18:13:39 | INFO     | src.agents.base_agent:log_execution:61 - ReportingAgent executing for transaction txn_b8c9ee482a0c4e46 - query='Analyze AAPL', symbols=['AAPL']
+2026-01-11 18:13:49 | INFO     | src.services.ingestion_service:ingest_analysis_report:131 - Ingested analysis report for ['AAPL'] (ID: dfdb4dc8-a6c8-430a-9d10-a288713ae9e6)
+2026-01-11 18:13:49 | INFO     | src.agents.reporting_agent:execute:98 - Report generated successfully
+2026-01-11 18:13:49 | INFO     | src.orchestrator.workflow:execute:522 - [WORKFLOW] Graph invoke completed - result_transaction_id=txn_b8c9ee482a0c4e46, result_query='Analyze AAPL', result_symbols=['AAPL'], result_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], result_research_data_keys=['AAPL']
+2026-01-11 18:19:17 | INFO     | src.mcp.mcp_client:__init__:27 - Initialized MCPClient (server_url=None)
+2026-01-11 18:19:17 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:19:17 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized ResearchAgent
+2026-01-11 18:19:17 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized AnalystAgent
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized ReportingAgent
+2026-01-11 18:19:17 | INFO     | src.graph_db.neo4j_client:__init__:10 - Connected to Neo4j at bolt://localhost:7687
+2026-01-11 18:19:17 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized EdgarAgent
+2026-01-11 18:19:17 | INFO     | src.agents.edgar_agent:_initialize_edgartools:61 - Set EDGAR identity: rajarn56@outlook.com
+2026-01-11 18:19:17 | INFO     | src.agents.edgar_agent:_initialize_edgartools:67 - Successfully initialized edgartools
+2026-01-11 18:19:17 | INFO     | src.api.routers.agents:get_workflow:104 - EDGAR Agent initialized successfully
+2026-01-11 18:19:17 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized ComparisonAgent
+2026-01-11 18:19:17 | INFO     | src.agents.base_agent:__init__:19 - Initialized TrendAgent
+2026-01-11 18:19:17 | INFO     | src.api.routers.agents:get_workflow:119 - Comparison and Trend agents initialized successfully
+2026-01-11 18:19:17 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:19:17 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
+2026-01-11 18:19:17 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:19:17 | INFO     | src.utils.query_intent:__init__:49 - Initialized QueryIntentClassifier
+2026-01-11 18:19:17 | INFO     | src.orchestrator.workflow:_build_graph:127 - LangGraph workflow compiled successfully
+2026-01-11 18:19:17 | INFO     | src.orchestrator.workflow:__init__:73 - MyFinGPTWorkflow initialized (Phase 5: edgar=True, Phase 6: comparison=True, trend=True, parallel=True, conditional=True)
+2026-01-11 18:19:17 | INFO     | src.utils.llm_client:__init__:25 - Initialized LLMClient with provider=lmstudio, model=openai/local-model
+2026-01-11 18:19:17 | INFO     | src.utils.query_parser:__init__:56 - Initialized QueryParser (LLM available: True)
+2026-01-11 18:19:17 | INFO     | src.vector_db.chroma_client:__init__:32 - Connected to Chroma at localhost:8001
+2026-01-11 18:19:17 | INFO     | src.vector_db.embeddings:__init__:52 - Initialized EmbeddingPipeline: provider=lmstudio, model=text-embedding-nomic-embed-text-v1.5
+2026-01-11 18:19:17 | INFO     | src.api.routers.agents:execute_agents:194 - Retrieved conversation context for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao (1 conversations)
+2026-01-11 18:19:17 | INFO     | src.api.routers.agents:execute_agents:200 - Parsing query: Compare AAPL and ORCL...
+2026-01-11 18:19:19 | INFO     | src.utils.query_parser:parse:94 - LLM extraction succeeded: symbols=['AAPL', 'ORCL'], intent=comparison
+2026-01-11 18:19:19 | INFO     | src.api.routers.agents:execute_agents:218 - Query parsing completed: method=llm, symbols=['AAPL', 'ORCL'], intent=comparison, entities={'timeframe': None, 'metrics': [], 'filing_type': None, 'filing_year': None}, needs_clarification=False
+2026-01-11 18:19:19 | INFO     | src.api.routers.agents:execute_agents:263 - Created initial state for transaction txn_3e548209bd68454c: query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL'], intent=comparison, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], symbols_type=<class 'list'>, symbols_value=['AAPL', 'ORCL']
+2026-01-11 18:19:19 | INFO     | src.api.routers.agents:execute_agents:275 - Executing agent workflow for transaction txn_3e548209bd68454c: query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL'], intent=comparison
+2026-01-11 18:19:19 | INFO     | src.api.routers.agents:execute_agents:284 - Final state validation before workflow execution - transaction_id=txn_3e548209bd68454c, query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL'], symbols_type=<class 'list'>, all_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:19:19 | INFO     | src.orchestrator.workflow:execute:492 - Executing workflow for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_size=768 bytes
+2026-01-11 18:19:19 | INFO     | src.orchestrator.workflow:execute:509 - [WORKFLOW] About to invoke graph - state_transaction_id=txn_3e548209bd68454c, state_query='Compare AAPL and ORCL', state_symbols=['AAPL', 'ORCL'], state_symbols_type=<class 'list'>, state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at'], state_dict_repr={'transaction_id': 'txn_3e548209bd68454c', 'session_id': 'HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao', 'query': 'Compare AAPL and ORCL', 'symbols': ['AAPL', 'ORCL'], 'research_data': {}, 'analyst_dat
+2026-01-11 18:19:19 | INFO     | src.orchestrator.workflow:_research_parallel_node:231 - [ResearchAgent] Parallel node received state - transaction_id=txn_3e548209bd68454c, query=Compare AAPL and ORCL, symbols=['AAPL', 'ORCL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:19:19 | INFO     | src.orchestrator.workflow:_research_parallel_node:264 - Executing parallel research for 2 symbols
+2026-01-11 18:19:19 | INFO     | src.agents.base_agent:log_execution:61 - ResearchAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL']
+2026-01-11 18:19:19 | INFO     | src.agents.research_agent:execute:47 - [ResearchAgent] State received - transaction_id=txn_3e548209bd68454c, query='Compare AAPL and ORCL', symbols=['AAPL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:19:19 | INFO     | src.agents.research_agent:execute:108 - ResearchAgent processing 1 symbol(s): ['AAPL']
+2026-01-11 18:19:20 | INFO     | src.services.ingestion_service:ingest_news_article:82 - Ingested news article: Company Information: Apple Inc.... (ID: 864d3212-8ce9-4ed7-9c75-84ee7807fc86)
+2026-01-11 18:19:20 | INFO     | src.agents.research_agent:execute:155 - Successfully fetched data for AAPL
+2026-01-11 18:19:20 | INFO     | src.agents.base_agent:log_execution:61 - ResearchAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['ORCL']
+2026-01-11 18:19:20 | INFO     | src.agents.research_agent:execute:47 - [ResearchAgent] State received - transaction_id=txn_3e548209bd68454c, query='Compare AAPL and ORCL', symbols=['ORCL'], state_keys=['transaction_id', 'session_id', 'query', 'symbols', 'research_data', 'analyst_data', 'report', 'edgar_data', 'comparison_data', 'trend_analysis', 'query_type', 'intent_flags', 'entities', 'errors', 'token_usage', 'citations', 'created_at', 'updated_at']
+2026-01-11 18:19:20 | INFO     | src.agents.research_agent:execute:108 - ResearchAgent processing 1 symbol(s): ['ORCL']
+2026-01-11 18:19:20 | INFO     | src.services.ingestion_service:ingest_news_article:82 - Ingested news article: Company Information: Oracle Corporation... (ID: e024e08b-4535-4eac-b3d2-1492dc3026e3)
+2026-01-11 18:19:20 | INFO     | src.agents.research_agent:execute:155 - Successfully fetched data for ORCL
+2026-01-11 18:19:20 | INFO     | src.agents.base_agent:log_execution:61 - EdgarAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL']
+2026-01-11 18:19:20 | INFO     | src.agents.edgar_agent:execute:104 - Fetching EDGAR data for AAPL
+2026-01-11 18:19:21 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-25-000079 (10-K)
+2026-01-11 18:19:22 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-24-000123 (10-K)
+2026-01-11 18:19:22 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-23-000106 (10-K)
+2026-01-11 18:19:22 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-22-000108 (10-K)
+2026-01-11 18:19:22 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000320193-21-000105 (10-K)
+2026-01-11 18:19:22 | INFO     | src.agents.edgar_agent:execute:104 - Fetching EDGAR data for ORCL
+2026-01-11 18:19:23 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000950170-25-087926 (10-K)
+2026-01-11 18:19:24 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000950170-24-075605 (10-K)
+2026-01-11 18:19:24 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0000950170-23-028914 (10-K)
+2026-01-11 18:19:25 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0001564590-22-023675 (10-K)
+2026-01-11 18:19:25 | INFO     | src.agents.edgar_agent:_process_filing:215 - Processing filing 0001564590-21-033616 (10-K)
+2026-01-11 18:19:26 | INFO     | src.agents.base_agent:log_execution:61 - AnalystAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL']
+2026-01-11 18:19:34 | INFO     | src.agents.analyst_agent:execute:66 - Completed analysis for AAPL
+2026-01-11 18:19:43 | INFO     | src.agents.analyst_agent:execute:66 - Completed analysis for ORCL
+2026-01-11 18:19:43 | INFO     | src.orchestrator.workflow:_route_advanced_agents:442 - Using pre-parsed query type: comparison
+2026-01-11 18:19:43 | INFO     | src.agents.base_agent:log_execution:61 - ComparisonAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL']
+2026-01-11 18:19:43 | INFO     | src.agents.comparison_agent:execute:72 - Multiple symbols detected (2), performing side-by-side comparison
+2026-01-11 18:19:43 | INFO     | src.agents.base_agent:log_execution:61 - TrendAgent executing for transaction txn_3e548209bd68454c - query='Compare AAPL and ORCL', symbols=['AAPL', 'ORCL']
+2026-01-11 18:19:43 | WARNING  | src.agents.trend_agent:_analyze_trend:111 - Insufficient historical data for AAPL, using basic trend analysis
+2026-01-11 18:19:50 | INFO     | src.agents.trend_agent:execute:75 - Completed trend analysis for AAPL
+2026-01-11 18:19:50 | WARNING  | src.agents.trend_agent:_analyze_trend:111 - Insufficient historical data for ORCL, using basic trend analysis
+2026-01-11 18:19:56 | INFO     | src.agents.trend_agent:execute:75 - Completed trend analysis for ORCL
+2026-01-11 18:19:56 | ERROR    | src.orchestrator.workflow:execute:533 - Workflow execution failed for transaction txn_3e548209bd68454c: 'dict' object has no attribute 'upper'
+2026-01-11 18:19:56 | ERROR    | src.api.routers.agents:execute_agents:329 - Error executing workflow: 'dict' object has no attribute 'upper'
+2026-01-11 18:20:51 | INFO     | src.api.routers.websocket:websocket_progress:31 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:20:51 | INFO     | src.services.progress_manager:disconnect:143 - WebSocket disconnected for session HKaCctqNQv015GYDtD4sh8dS05AbBs_3QDXiSRWToao
+2026-01-11 18:20:51 | INFO     | __main__:shutdown_event:78 - Shutting down MyFinGPT-POC-V2 backend
