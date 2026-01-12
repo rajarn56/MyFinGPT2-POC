@@ -1,6 +1,6 @@
 """Performance monitoring service for Phase 9"""
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from loguru import logger
 from datetime import datetime
 
