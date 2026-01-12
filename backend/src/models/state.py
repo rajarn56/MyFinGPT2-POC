@@ -2,13 +2,29 @@
 
 from typing import TypedDict, List, Dict, Any, Optional, Annotated
 from datetime import datetime
+from loguru import logger
 
 
 def first_value_reducer(left: Any, right: Any) -> Any:
     """
     Reducer for immutable fields: always return the first (left) value.
     Used for fields that should never change during workflow execution.
+    
+    However, if left is empty/None and right has a value, prefer right.
+    This handles the case where LangGraph initializes an empty state first.
     """
+    # If left is None, empty string, or empty list, and right has a value, use right
+    # This handles initial state setup where LangGraph might create empty state first
+    if left is None:
+        logger.debug(f"first_value_reducer: Replacing None with {right}")
+        return right
+    if isinstance(left, str) and left == "" and right:
+        logger.debug(f"first_value_reducer: Replacing empty string with '{right}'")
+        return right
+    if isinstance(left, list) and len(left) == 0 and right and len(right) > 0:
+        logger.debug(f"first_value_reducer: Replacing empty list with {right}")
+        return right
+    # Otherwise, return left to maintain immutability once set
     return left
 
 
