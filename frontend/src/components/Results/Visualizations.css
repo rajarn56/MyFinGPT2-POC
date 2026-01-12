@@ -1,0 +1,33 @@
+.visualizations {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.visualizations__empty {
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+.visualizations__empty h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.visualizations__empty p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.visualizations__chart {
+  margin-bottom: 2rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.visualizations__chart:last-child {
+  margin-bottom: 0;
+}

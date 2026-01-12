@@ -119,12 +119,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         setCurrentAnalysis(response);
 
-        // Add assistant message with report
-        if (response.result.report) {
+        // Add assistant message with summary (or fallback to report if summary not available)
+        const messageContent = response.result.summary || response.result.report;
+        if (messageContent) {
           const assistantMessage: ChatMessage = {
             id: `msg_${Date.now() + 1}`,
             role: 'assistant',
-            content: response.result.report,
+            content: messageContent,
             timestamp: new Date().toISOString(),
             transaction_id: response.transaction_id,
           };

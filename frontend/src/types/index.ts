@@ -47,6 +47,7 @@ export interface ExecuteResponse {
     research_data: Record<string, any>;
     analyst_data: Record<string, any>;
     report: string | null;
+    summary: string | null;
     edgar_data: Record<string, any>;
     comparison_data: Record<string, any>;
     trend_analysis: Record<string, any>;

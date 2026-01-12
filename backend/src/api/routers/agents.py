@@ -308,6 +308,23 @@ async def execute_agents(
         if result.get("errors"):
             status = "completed_with_errors"
         
+        # Ensure all required fields are present and properly formatted
+        citations = result.get("citations", [])
+        if not isinstance(citations, list):
+            citations = []
+        
+        token_usage = result.get("token_usage", {})
+        if not isinstance(token_usage, dict):
+            token_usage = {}
+        
+        comparison_data = result.get("comparison_data", {})
+        if not isinstance(comparison_data, dict):
+            comparison_data = {}
+        
+        trend_analysis = result.get("trend_analysis", {})
+        if not isinstance(trend_analysis, dict):
+            trend_analysis = {}
+        
         return {
             "transaction_id": result["transaction_id"],
             "status": status,
@@ -315,13 +332,14 @@ async def execute_agents(
                 "research_data": result.get("research_data", {}),
                 "analyst_data": result.get("analyst_data", {}),  # Phase 3
                 "report": result.get("report"),  # Phase 3
+                "summary": result.get("summary"),  # Group 5: Summary for chat messages
                 "edgar_data": result.get("edgar_data", {}),  # Phase 5
-                "comparison_data": result.get("comparison_data", {}),  # Phase 6
-                "trend_analysis": result.get("trend_analysis", {}),  # Phase 6
+                "comparison_data": comparison_data,  # Phase 6 - for Visualizations tab
+                "trend_analysis": trend_analysis,  # Phase 6 - for Visualizations tab
                 "query_type": result.get("query_type"),  # Phase 6
-                "citations": result.get("citations", []),
+                "citations": citations,  # For CitationsPanel tab
                 "errors": result.get("errors", []),
-                "token_usage": result.get("token_usage", {})
+                "token_usage": token_usage  # For AgentActivity tab
             }
         }
         

@@ -198,6 +198,17 @@ class ComparisonAgent(BaseAgent):
         Returns:
             Metrics dictionary
         """
+        # Extract sentiment safely - handle both dict and string formats
+        raw_sentiment = analysis.get("sentiment", "neutral")
+        sentiment_value = self._extract_sentiment_value(raw_sentiment)
+        
+        # Extract sentiment score - handle both dict and direct value
+        sentiment_score = 0.0
+        if isinstance(raw_sentiment, dict):
+            sentiment_score = raw_sentiment.get("score", 0.0)
+        else:
+            sentiment_score = analysis.get("sentiment_score", 0.0)
+        
         return {
             "symbol": symbol,
             "current_price": price_data.get("current_price") or price_data.get("price"),
@@ -211,8 +222,8 @@ class ComparisonAgent(BaseAgent):
                 "profit_margin": company_info.get("profitMargins"),
                 "debt_to_equity": company_info.get("debtToEquity"),
             },
-            "sentiment": analysis.get("sentiment", "neutral"),
-            "sentiment_score": analysis.get("sentiment_score", 0.0),
+            "sentiment": sentiment_value,
+            "sentiment_score": sentiment_score,
             "recommendation": analysis.get("recommendation", "hold")
         }
     
@@ -230,13 +241,17 @@ class ComparisonAgent(BaseAgent):
         rows = []
         
         for symbol, symbol_metrics in metrics.items():
+            # Safely extract sentiment value - handle both dict and string formats
+            sentiment = symbol_metrics.get("sentiment", "neutral")
+            sentiment_value = self._extract_sentiment_value(sentiment)
+            
             row = [
                 symbol,
                 f"${symbol_metrics.get('current_price', 'N/A')}",
                 self._format_market_cap(symbol_metrics.get("market_cap")),
                 symbol_metrics.get("pe_ratio", "N/A"),
                 symbol_metrics.get("sector", "N/A"),
-                symbol_metrics.get("sentiment", "neutral").upper()
+                sentiment_value.upper()
             ]
             rows.append(row)
         
@@ -244,6 +259,40 @@ class ComparisonAgent(BaseAgent):
             "headers": headers,
             "rows": rows
         }
+    
+    def _extract_sentiment_value(self, sentiment: Any) -> str:
+        """
+        Safely extract sentiment value from dict or string
+        
+        Args:
+            sentiment: Sentiment value (can be dict, string, or other type)
+            
+        Returns:
+            Sentiment string value ("bullish", "bearish", or "neutral")
+        """
+        if isinstance(sentiment, dict):
+            # Try common dict keys for sentiment value
+            sentiment_value = (
+                sentiment.get("sentiment") or
+                sentiment.get("value") or
+                sentiment.get("label")
+            )
+            if sentiment_value and isinstance(sentiment_value, str):
+                return sentiment_value.lower()
+            else:
+                logger.warning(
+                    f"Unexpected sentiment dict structure: {sentiment}. "
+                    "Expected keys: 'sentiment', 'value', or 'label'"
+                )
+                return "neutral"
+        elif isinstance(sentiment, str):
+            return sentiment.lower()
+        else:
+            logger.warning(
+                f"Unexpected sentiment type: {type(sentiment)}. "
+                f"Value: {sentiment}. Defaulting to 'neutral'"
+            )
+            return "neutral"
     
     def _format_market_cap(self, market_cap: Optional[float]) -> str:
         """Format market cap for display"""
